@@ -2,6 +2,7 @@ package list
 
 import (
 	"encoding/json"
+	"faya/db"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -85,13 +86,20 @@ func getDataTime(t *gtime.Time) (*gtime.Time, error) {
 	return gtime.New(ret_time), err
 }
 
+func test(obj interface{})interface{}{
+	return obj
+}
+
 func Get() []*TimeObject {
 	fmt.Println("list.Get(")
 	nosql := true
 	
-	content, had := db.Get("list")
-	if had == false {
-
+	cacheKey := "list"
+	contentStr, had := db.Get(cacheKey)
+	var content []byte 
+	if had == true {
+		content = []byte(contentStr)
+	} else {
 		resp, err := http.Get(listUrl)
 		if err != nil {
 			fmt.Println("http.get error", listUrl)
@@ -111,10 +119,13 @@ func Get() []*TimeObject {
 			//return body, errors.New(strconv.Itoa(resp.StatusCode))
 		}
 		content = body
+		//bodyStr := string(body)
+		db.Insert(cacheKey, string(body))
+
 	}
 
 	var resp2 TimeListWrapper
-	err = json.Unmarshal(body, &resp2)
+	err := json.Unmarshal(content, &resp2)
 	if err != nil {
 		fmt.Println("json unmarshal error : " + err.Error())
 		return nil
@@ -122,12 +133,24 @@ func Get() []*TimeObject {
 
 	writeTime := gtime.Now()
 	contentTime, err := getDataTime(writeTime)
-	fmt.Println(contentTime)
+	fmt.Println("get content time:", contentTime)
 
 	for _, obj := range resp2.Data.Diff {
-		fmt.Println(obj)
+		//fmt.Println(obj)
+		test(obj)
 		if nosql {
 		}
 	}
+	fmt.Println("get list length:", len(resp2.Data.Diff))
 	return resp2.Data.Diff
+}
+
+func GetObj(str string) TimeObject{
+	l := Get()
+	for _, o := range l{
+		if o.Code == str || o.Name == str {
+			return *o
+		}
+	}
+	return TimeObject{}
 }

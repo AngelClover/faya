@@ -3,6 +3,7 @@ package main
 import (
 	"faya/filter"
 	"faya/list"
+	"faya/view"
 
 	//asdas
 	"fmt"
@@ -13,10 +14,13 @@ import (
 
 func main() {
 	fmt.Println("vim-go")
+	view.PlotRik("300949")
+	return
 	l := list.Get()
-	l = filter.Filter300(l)
-	a := filter.RecentZtFilter(l)
-	for _, op := range a {
+	//l = filter.Filter300(l)
+	l = filter.RecentZtFilter(l)
+	//view.Plot(l[0])
+	for _, op := range l {
 		fmt.Println(*op)
 	}
 	/*

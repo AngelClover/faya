@@ -2,11 +2,13 @@ package list
 
 import (
 	"encoding/json"
+	"faya/db"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type RiKUnit struct {
@@ -22,7 +24,6 @@ type RiKUnit struct {
 	DetPrice float64
 	Turnover float64
 	Features map[string]interface{}
-
 }
 type RiKDailyString struct {
 	text string
@@ -41,6 +42,8 @@ type RiKDetails struct {
 var (
 	RikUrlPart1 = "http://74.push2his.eastmoney.com/api/qt/stock/kline/get?secid="
 	RikUrlPart2 = "&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&klt=101&fqt=0&end=20500101&lmt=120"
+	lastWebVisitTime = time.Now()
+	webVisitInterval = 100 * time.Millisecond
 )
 
 type RiKResponse struct {
@@ -61,35 +64,53 @@ func RiKCode(code string) []*RiKUnit {
 	if strings.Index(code, "6") == 0 {
 		market = "1"
 	}
-	RikUrl := RikUrlPart1 + market + "." + code + RikUrlPart2
-	resp, err := http.Get(RikUrl)
-	if err != nil {
-		fmt.Println("http.get error", listUrl)
-		return nil
-	}
-	defer resp.Body.Close()
-// 	fmt.Println(resp)
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("ioutil.readAll error", resp.Body)
-		return  nil
+	cacheKey := code + "rik"
+	var content []byte
+	contentStr, had := db.Get(cacheKey)
+	if had == true {
+		content = []byte(contentStr)
+	}else {
+		RikUrl := RikUrlPart1 + market + "." + code + RikUrlPart2
+		//time control
+		timeSpend := time.Since(lastWebVisitTime)
+		fmt.Println("timespend:", timeSpend," for web visit time interval:", webVisitInterval, "last:", lastWebVisitTime)
+		if timeSpend < webVisitInterval{
+			fmt.Println("sleep for web visit time interval:", webVisitInterval)
+			time.Sleep(webVisitInterval)
+		}
+
+		resp, err := http.Get(RikUrl)
+		lastWebVisitTime = time.Now()
+		if err != nil {
+			fmt.Println("http.get error", listUrl)
+			return nil
+		}
+		defer resp.Body.Close()
+	// 	fmt.Println(resp)
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Println("ioutil.readAll error", resp.Body)
+			return  nil
+		}
+
+		if resp.StatusCode > 299 {
+			fmt.Println("Response failed with status code: %d and\nbody: %s\n", resp.StatusCode, body)
+			return nil
+			//return body, errors.New(strconv.Itoa(resp.StatusCode))
+		}
+		
+		content = body
+		db.Insert(cacheKey, string(body))
 	}
 
-	if resp.StatusCode > 299 {
-		fmt.Println("Response failed with status code: %d and\nbody: %s\n", resp.StatusCode, body)
-		return nil
-		//return body, errors.New(strconv.Itoa(resp.StatusCode))
-	}
-	//fmt.Println(body)
-
+	//fmt.Println(content)
 	var resp2 RiKResponse
-	err = json.Unmarshal(body, &resp2)
+	err := json.Unmarshal(content, &resp2)
 
 	if err != nil {
 		fmt.Println("json unmarshal error : " + err.Error())
 		return nil
 	}
-
 	//fmt.Println(resp2.Data)
 // 	fmt.Println(resp2.Data.Klines)
 // 	fmt.Println(strings.Split(resp2.Data.Klines[0], ","))
@@ -162,13 +183,18 @@ func RiKCode(code string) []*RiKUnit {
 		rk.Features = make(map[string]interface{})
 		ret = append(ret, &rk)
 	}
+	return ret
 // 	fmt.Println(ret)
 // 	print(ret)
 // 	return resp2.Data.Klines
+// reverse
+
+}
+func RiKCodeReverse(code string) []*RiKUnit {
+	ret := RiKCode(code)
 	rev := make([]*RiKUnit, 0)
 	for i := len(ret) - 1; i >= 0; i = i - 1 {
 		rev = append(rev, ret[i])
 	}
 	return rev
-
 }
