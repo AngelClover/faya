@@ -51,6 +51,19 @@ func client() {
     }
 }
 
+func getInstance() *redis.Client {
+	var inc *redis.Client
+	if inc == nil {
+		rdb := redis.NewClient(&redis.Options{
+			Addr:     "localhost:6379",
+			Password: "", // no password set
+			DB:       0,  // use default DB
+		})
+		inc = rdb
+	}
+	return inc
+}
+
 /*
 api level cache
 */
@@ -58,22 +71,29 @@ func Get(key string) (string, bool) {
 	if read == false {
 		return "", false
 	}
-
+	// 	time.Sleep(1 * time.Second)
 	rdb := redis.NewClient(&redis.Options{
-        Addr:     "localhost:6379",
-        Password: "", // no password set
-        DB:       0,  // use default DB
-    })
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+	defer rdb.Close()
+
 	val, err := rdb.Get(ctx, key).Result()
 	//exsistance
 	if err == redis.Nil {
 		fmt.Println("key:", key, "does not exist")
 		return "", false
-	}else if err != nil {
+	} else if err != nil {
 		fmt.Println("cannot found out", key, "should panic")
-		return "", false
+		//return "", false
 	}
-	fmt.Println("cache key:", key, "content:", val)
+// 	fmt.Println("cache key:", key, "content:", val)
+
+	if len(val) < 3{
+		fmt.Println("cache key:", key, "content:", val, "len:", len(val))
+		return  "", false
+	}
 	
 	//valid judge
 	var cc cacheUnit
@@ -81,10 +101,11 @@ func Get(key string) (string, bool) {
 	err = json.Unmarshal(valb, &cc)
 	if err != nil {
 		fmt.Println("dbdata unmarshal error", err.Error)
+		fmt.Println(val)
 		return "", false
 	}
 	// expire judge
-	fmt.Println("get content time:", cc.Tm)
+// 	fmt.Println("get content time:", cc.Tm)
 	if doNotCheckTime == false {
 		yn, mn, dn := time.Now().Date()
 		yr, mr, dr := cc.Tm.Date()
@@ -93,8 +114,9 @@ func Get(key string) (string, bool) {
 			return "", false
 		}
 	}
+
 	// read correct from db
-	fmt.Println("get ", key, "from db")
+// 	fmt.Println("get ", key, "from db")
 	return cc.Content, true
 }
 
@@ -107,6 +129,7 @@ func Insert(key string, val string) {
         Password: "", // no password set
         DB:       0,  // use default DB
     })
+	defer rdb.Close()
 	if clear == true {
 		err := rdb.Set(ctx, key, "", 0).Err()
 		if err != nil {
@@ -129,5 +152,5 @@ func Insert(key string, val string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("set ", key, "succ at time:", cc.Tm)
+// 	fmt.Println("set ", key, "succ at time:", cc.Tm)
 }

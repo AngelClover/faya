@@ -17,7 +17,7 @@ func Get(code string, datatype string) interface{} {
 	dm := d.(map[string]interface{})
 	res, okk := dm[datatype]
 	if !okk {
-		fmt.Println("get data for ", code, datatype)
+		//fmt.Println("get data for ", code, datatype)
 		if datatype == "rik" {
 			dm[datatype] = list.RiKCode(code)
 // 			fmt.Println("get data:", dm[datatype])

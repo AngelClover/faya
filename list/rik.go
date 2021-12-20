@@ -82,7 +82,7 @@ func RiKCode(code string) []*RiKUnit {
 		resp, err := http.Get(RikUrl)
 		lastWebVisitTime = time.Now()
 		if err != nil {
-			fmt.Println("http.get error", listUrl)
+			fmt.Println("http.get error", RikUrl, err)
 			return nil
 		}
 		defer resp.Body.Close()

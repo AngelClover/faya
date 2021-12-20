@@ -1,0 +1,14 @@
+
+
+
+base datastruct:
+    int list/ (now)
+fetch data : list/
+
+
+             -> : read
+             => : write
+
+filter, strategy, feature -> data-> list -> eastmoney(external)
+                                    -> => cache(db/)
+

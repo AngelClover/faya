@@ -36,6 +36,11 @@ type TimeObject struct {
 	Pe             interface{} `json:"f9"`  // 市盈率
 	Pb             interface{} `json:"f23"` // 市净率
 }
+/*
+type Object struct {
+	StockFeatures map[string] interface{}
+}
+*/
 
 type TimeList struct {
 	Diff []*TimeObject `json:"diff"`

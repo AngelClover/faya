@@ -44,15 +44,16 @@ func RecentZtFilter(input []* list.TimeObject) []*list.TimeObject{
 			fmt.Println("cast error", a)
 		}
 		if len(b) > 0 {
-			fmt.Println(b[0])
+// 			fmt.Println(b[0])
 			for j := 0; j < 3 && j < len(b); j = j + 1{
 				if ZtJudge(obj.Code, b[j].Det) {
-					fmt.Println(obj.Code, obj.Name, "has zt for last", j, "days with det:", b[j].Det)
+					//fmt.Println(obj.Code, obj.Name, "has zt for last", j, "days with det:", b[j].Det)
 					ret = append(ret, obj)
 					break
 				}
 			}
 		}
 	}
+	fmt.Println("RecentZtFilter done :", len(ret))
 	return ret
 }
