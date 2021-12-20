@@ -1,57 +1,23 @@
 package main
 
 import (
-	"faya/features"
-	"faya/filter"
-	"faya/list"
-	"sort"
-
 	//asdas
+	"faya/strategy"
 	"fmt"
 	//sadas
 )
 
 //Faya
-type O struct {
-	Code string
-	Name string
-	Ztdays []int
-	Detp []float64
-}
 
 func main() {
 	fmt.Println("vim-go")
 	//view.PlotRik("300949")
-	l := list.Get()
+// 	l := list.Get()
 	//l = filter.Filter300(l)
-	l = filter.RecentZtFilter(l)
+// 	l = filter.RecentZtFilter(l)
 	//view.Plot(l[0])
 
-	oo := make([]O, 0)
-	for _, op := range l {
-		//fmt.Println(*op)
-		a := list.RiKCodeReverse(op.Code)
-		features.GetDay5(a)
-		depa := features.GetDay5Det(a)
-		ret := features.GetZtDays(op, a)
-		if len(depa) > 2{
-			var o O
-			o.Code = op.Code
-			o.Name = op.Name
-			o.Ztdays = ret
-			o.Detp = depa
-			oo = append(oo, o)
-			//fmt.Printf("%s %s %v => %.2f %.2f %.2f\n", op.Code, op.Name, ret, depa[2], depa[1], depa[0])
-		} else {
-			fmt.Println(op.Code, op.Name, ret, depa)
-		}
-	}
-	sort.Slice(oo, func(i, j int) bool {
-		return oo[i].Detp[0] > oo[j].Detp[0]
-	})
-	for _, o := range oo{
-		fmt.Printf("%s %s %v => %.2f %.2f %.2f\n", o.Code, o.Name, o.Ztdays, o.Detp[2], o.Detp[1], o.Detp[0])
-	}
+	strategy.Day5Viewer()
 
 	/*
 	a := list.RiKCode("300364")
