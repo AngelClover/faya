@@ -1,7 +1,7 @@
 package main
 
 import (
-	//asdas
+	"faya/list"
 	"faya/strategy"
 	"fmt"
 	//sadas
@@ -12,10 +12,17 @@ import (
 func main() {
 	fmt.Println("vim-go")
 	//view.PlotRik("300949")
-// 	l := list.Get()
-	//l = filter.Filter300(l)
+  	l := list.Get()
+// 	//l = filter.Filter300(l)
 // 	l = filter.RecentZtFilter(l)
-	//view.Plot(l[0])
+// 	//view.Plot(l[0])
+	for _, o := range l{
+		fmt.Println(o)
+		list.GetBkCode(o.Code)
+	}
+
+// 	list.GetBkCode("301111")
+
 
 	strategy.Day5Viewer()
 

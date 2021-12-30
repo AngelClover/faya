@@ -58,19 +58,23 @@ type RiKResponse struct {
 func RiK(obj TimeObject) []*RiKUnit{
 	return RiKCode(obj.Code)
 }
-func RiKCode(code string) []*RiKUnit {
-
+func GetSecid(code string) string{
 	market := "0"
 	if strings.Index(code, "6") == 0 {
 		market = "1"
 	}
+	return market + "." + code
+	
+}
+func RiKCode(code string) []*RiKUnit {
+
 	cacheKey := code + "rik"
 	var content []byte
 	contentStr, had := db.Get(cacheKey)
 	if had == true {
 		content = []byte(contentStr)
 	}else {
-		RikUrl := RikUrlPart1 + market + "." + code + RikUrlPart2
+		RikUrl := RikUrlPart1 + GetSecid(code) + RikUrlPart2
 		//time control
 		timeSpend := time.Since(lastWebVisitTime)
 		fmt.Println("timespend:", timeSpend," for web visit time interval:", webVisitInterval, "last:", lastWebVisitTime)

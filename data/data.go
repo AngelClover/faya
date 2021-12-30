@@ -26,6 +26,9 @@ func Get(code string, datatype string) interface{} {
 			dm[datatype] = list.RiKCodeReverse(code)
 // 			fmt.Println("get data:", dm[datatype])
 			res = dm[datatype]
+		}else if datatype == "bk" {
+			dm[datatype] = list.GetBkCode(code)
+			res = dm[datatype]
 		}else {
 			fmt.Println("get datatype error")
 			res = nil

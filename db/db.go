@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -14,7 +15,7 @@ var (
 	read = true
 	write = true
 	clear = false
-	doNotCheckTime = true
+	doNotCheckTime = false
 )
 
 type cacheUnit struct {
@@ -104,9 +105,16 @@ func Get(key string) (string, bool) {
 		fmt.Println(val)
 		return "", false
 	}
+	doExpireJudge := true
+	if strings.Index(key, "bk") > 4 {
+		doExpireJudge = false
+	}
+	if doNotCheckTime {
+		doExpireJudge = false
+	}
 	// expire judge
 // 	fmt.Println("get content time:", cc.Tm)
-	if doNotCheckTime == false {
+	if doExpireJudge {
 		yn, mn, dn := time.Now().Date()
 		yr, mr, dr := cc.Tm.Date()
 		if yn != yr || mn != mr || dn != dr {
@@ -116,7 +124,7 @@ func Get(key string) (string, bool) {
 	}
 
 	// read correct from db
-// 	fmt.Println("get ", key, "from db")
+ 	fmt.Println("get ", key, "from db")
 	return cc.Content, true
 }
 
@@ -152,5 +160,5 @@ func Insert(key string, val string) {
 	if err != nil {
 		panic(err)
 	}
-// 	fmt.Println("set ", key, "succ at time:", cc.Tm)
+	fmt.Println("set ", key, "succ at time:", cc.Tm)
 }

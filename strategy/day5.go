@@ -13,9 +13,10 @@ type O struct {
 	Name string
 	Ztdays []int
 	Detp []float64
+	Bk string
 }
 func Day5Viewer() {
-	fmt.Println("vim-go")
+// 	fmt.Println("vim-go")
 	//view.PlotRik("300949")
 	l := list.Get()
 	//l = filter.Filter300(l)
@@ -29,23 +30,25 @@ func Day5Viewer() {
 		features.GetDay5(a)
 		depa := features.GetDay5Det(a)
 		ret := features.GetZtDays(op, a)
+		bk := features.GetBk(op)
 		if len(depa) > 2{
 			var o O
 			o.Code = op.Code
 			o.Name = op.Name
 			o.Ztdays = ret
 			o.Detp = depa
+			o.Bk = bk
 			oo = append(oo, o)
 			//fmt.Printf("%s %s %v => %.2f %.2f %.2f\n", op.Code, op.Name, ret, depa[2], depa[1], depa[0])
 		} else {
-			fmt.Println(op.Code, op.Name, ret, depa)
+			fmt.Println(op.Code, op.Name, ret, depa, bk)
 		}
 	}
 	sort.Slice(oo, func(i, j int) bool {
 		return oo[i].Detp[0] > oo[j].Detp[0]
 	})
 	for _, o := range oo{
-		fmt.Printf("%s %s %v => %.2f %.2f %.2f\n", o.Code, o.Name, o.Ztdays, o.Detp[2], o.Detp[1], o.Detp[0])
+		fmt.Printf("%s %s %s %v => %.2f %.2f %.2f\n", o.Code, o.Name, o.Bk, o.Ztdays, o.Detp[2], o.Detp[1], o.Detp[0])
 	}
 
 	/*
