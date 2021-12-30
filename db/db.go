@@ -124,7 +124,7 @@ func Get(key string) (string, bool) {
 	}
 
 	// read correct from db
- 	fmt.Println("get ", key, "from db")
+//  	fmt.Println("get ", key, "from db")
 	return cc.Content, true
 }
 

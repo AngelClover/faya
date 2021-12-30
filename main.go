@@ -1,7 +1,7 @@
 package main
 
 import (
-	"faya/list"
+	"faya/strategy"
 	"fmt"
 	//sadas
 )
@@ -24,7 +24,8 @@ func main() {
 	*/
 
 // 	list.GetBkCode("301111")
- 	list.MinCode("301111")
+ 	//list.MinCode("301111")
+	strategy.ZtReview()
 
 
 	//strategy.Day5Viewer()
