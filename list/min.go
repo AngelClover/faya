@@ -55,9 +55,56 @@ type MinResponse struct {
 	Data *MinDetails `json:"data"`     // data can be null in return
 }
 
+func isOpeningTime() bool {
+	loc := time.FixedZone("UTC+8", +8*60*60)
+	now := time.Now()
+
+	if now.Weekday() == time.Sunday || now.Weekday() == time.Saturday {
+		return false
+	}
+
+	y := now.Year()
+	m := now.Month()
+	d := now.Day()
+	startTime := time.Date(y, m, d, 9, 15, 0, 0, loc)
+	endTime := time.Date(y, m, d, 15, 00, 0, 0, loc)
+
+	if now.After(startTime) && endTime.After(now) {
+		return true
+	}
+	return false
+}
+
+func getCacheKeyMin(code string) string {
+	ret := code + "min"
+
+	loc := time.FixedZone("UTC+8", +8*60*60)
+	now := time.Now()
+	y := now.Year()
+	m := now.Month()
+	d := now.Day()
+	startTime := time.Date(y, m, d, 9, 15, 0, 0, loc)
+	
+// 	fmt.Println(time.Now().Date())
+// 	fmt.Println(startTime)
+// 	fmt.Println(startTime.Local())
+	if !now.After(startTime) {
+		now = now.AddDate(0, 0, -1)
+		for ; now.Weekday() == time.Sunday || now.Weekday() == time.Saturday; {
+			now = now.AddDate(0, 0, -1)
+		}
+	}
+// 	str := now.Date()
+// 	fmt.Println(now.String())
+// 	fmt.Println(strings.Split(now.String(), " ")[0])
+	ret = ret + strings.Split(now.String(), " ")[0]
+	return ret
+
+}
+
 func MinCode(code string) []*MinUnit {
 
-	cacheKey := code + "min"
+	cacheKey := getCacheKeyMin(code)
 	var content []byte
 	contentStr, had := db.Get(cacheKey)
 	if had == true {
@@ -97,7 +144,9 @@ func MinCode(code string) []*MinUnit {
 		}
 		
 		content = body
-		//db.Insert(cacheKey, string(body))
+		if !isOpeningTime(){
+			db.Insert(cacheKey, string(body))
+		}
 	}
 
 // 	fmt.Println(content)
