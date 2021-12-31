@@ -111,7 +111,7 @@ func MinCode(code string) []*MinUnit {
 		content = []byte(contentStr)
 	}else {
 		MinUrl := MinUrlPart1 + GetSecid(code) + MinUrlPart2
-		fmt.Println(MinUrl)
+// 		fmt.Println(MinUrl)
 		//time control
 		timeSpend := time.Since(lastWebVisitTime)
 		fmt.Println("timespend:", timeSpend," for web visit time interval:", webVisitInterval, "last:", lastWebVisitTime)
@@ -232,7 +232,7 @@ func MinCode(code string) []*MinUnit {
 		*/
 		min.Features = make(map[string]interface{})
 		ret = append(ret, &min)
-		fmt.Println(min)
+// 		fmt.Println(min)
 	}
 	return ret
 

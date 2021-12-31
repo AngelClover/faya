@@ -6,6 +6,7 @@ import (
 	"faya/list"
 	"fmt"
 	"sort"
+	"strings"
 )
 
 
@@ -15,6 +16,9 @@ type ZtD struct {
 	Days int
 	Det float64
 	Succ bool
+	Firstfb string
+	Lastfb string
+	Turnover float64
 }
 
 func ZtViewer() {
@@ -41,12 +45,36 @@ func ZtViewer() {
 	}
 }
 
+func UpPercent(code string) float64{
+	if strings.Index(code, "30") == 0 {
+		return 20.0
+	}
+	if strings.Index(code, "688") == 0 {
+		return 20.0
+	}
+	if strings.Index(code, "8") == 0 {
+		return 30.0
+	}
+	//not deal with ST
+	return 10.0
+}
+
 func ZtReview() {
 	l := list.Get()
 	zto := make([]ZtD, 0)
 	for _, op := range l {
 		a := list.RiKCodeReverse(op.Code)
 		ztdayscount := features.GetZtDaysCount(op, a)
+		fzt := "no"
+		lzt := "no"
+		if len(a) > 0 && ztdayscount > 0 {
+			b := list.MinCode(op.Code)
+			basePrice := a[0].Open
+			if len(a) > 1 {
+				basePrice = a[1].Close
+			}
+			fzt, lzt = features.GetFengbanTime(op, b, basePrice * (1 + UpPercent(op.Code)*0.01))
+		}
 		base := 0
 		if len(a) > 1{
 			base = a[1].Features["ZtDaysCount"].(int)
@@ -60,6 +88,10 @@ func ZtReview() {
 			if filter.ZtJudge(d.Code, d.Det) {
 				d.Succ = true
 			}
+			d.Firstfb = fzt
+			d.Lastfb = lzt
+			d.Turnover = a[0].Turnover
+
 			zto = append(zto, d)
 		}
 	}
@@ -84,6 +116,6 @@ func ZtReview() {
 		if o.Succ {
 			str = "成功"
 		}
-		fmt.Printf("%s %s ^ %d进%d%s %f %s\n", o.Code, o.Name, o.Days, o.Days+1, str, o.Det, list.GetBkCode(o.Code))
+		fmt.Printf("%s %s ^ %d进%d%s %f |%s %s| %s \n", o.Code, o.Name, o.Days, o.Days+1, str, o.Det, o.Firstfb, o.Lastfb, list.GetBkCode(o.Code))
 	}
 }

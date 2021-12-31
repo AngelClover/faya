@@ -14,6 +14,9 @@ func ZtJudge(code string, detp float64) bool {
 	if strings.Index(code, "688") == 0 && detp > 19 {
 		return true
 	}
+	if strings.Index(code, "8") == 0 && detp > 29 {
+		return true
+	}
 	if strings.Index(code, "30") != 0 && strings.Index(code, "688") != 0 && detp > 9.6{
 		return true
 	}

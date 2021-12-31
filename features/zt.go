@@ -3,6 +3,7 @@ package features
 import (
 	"faya/filter"
 	"faya/list"
+	"strings"
 )
 
 // last day is [0]
@@ -40,3 +41,33 @@ func GetZtDaysCount(o *list.TimeObject, rklist []*list.RiKUnit) int {
 	return ret 
 }
 
+func getTime(str string) string {
+	ll := strings.Split(str, " ")
+	ret := str
+	if len(ll) > 1 {
+		ret = ll[1]
+	}
+	return ret
+}
+func GetFengbanTime(o *list.TimeObject, mlist []*list.MinUnit, uplimit float64) (string,string) {
+	ll := len(mlist)
+	first := "none"
+	for i := 0; i < ll; i = i + 1 {
+		if mlist[i].Close >= uplimit * 0.999 {
+			first = mlist[i].DateTime
+			break
+		}
+	}
+	last := "none"
+	for i := ll - 1; i >= 0; i = i - 1 {
+		if mlist[i].Close < uplimit * 0.999 {
+			j := i + 1
+			if j >= ll {
+				j = j - 1
+			}
+			last = mlist[j].DateTime
+			break
+		}
+	}
+	return getTime(first),getTime(last)
+}
