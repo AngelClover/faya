@@ -245,6 +245,6 @@ func MinCodeReverse(code string) []*MinUnit {
 	}
 	return rev
 }
-func Min(obj TimeObject) []*MinUnit{
+func Min(obj *TimeObject) []*MinUnit{
 	return MinCode(obj.Code)
 }

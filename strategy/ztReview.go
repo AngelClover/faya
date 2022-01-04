@@ -23,6 +23,7 @@ type ZtD struct {
 
 func ZtViewer() {
 	l := list.Get()
+	l = filter.LajiFilter(l)
 	zto := make([]ZtD, 0)
 	for _, op := range l {
 		a := list.RiKCodeReverse(op.Code)
@@ -61,6 +62,7 @@ func UpPercent(code string) float64{
 
 func ZtReview() {
 	l := list.Get()
+	l = filter.LajiFilter(l)
 	zto := make([]ZtD, 0)
 	for _, op := range l {
 		a := list.RiKCodeReverse(op.Code)

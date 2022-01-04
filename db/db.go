@@ -115,10 +115,17 @@ func Get(key string) (string, bool) {
 	// expire judge
 // 	fmt.Println("get content time:", cc.Tm)
 	if doExpireJudge {
-		yn, mn, dn := time.Now().Date()
+		now := time.Now()
+		yn, mn, dn := now.Date()
 		yr, mr, dr := cc.Tm.Date()
 		if yn != yr || mn != mr || dn != dr {
 			fmt.Println("db find content for key:", key, " but it is the date:", cc.Tm)
+			return "", false
+		}
+		//add same day expire judge
+		loc := time.FixedZone("UTC+8", +8*60*60)
+		endTime := time.Date(yn, mn, dn, 15, 0, 0, 0, loc)
+		if endTime.After(cc.Tm) && now.After(endTime) {
 			return "", false
 		}
 	}

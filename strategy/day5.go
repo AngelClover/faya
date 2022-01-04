@@ -20,6 +20,7 @@ func Day5Viewer() {
 	//view.PlotRik("300949")
 	l := list.Get()
 	//l = filter.Filter300(l)
+	l = filter.LajiFilter(l)
 	l = filter.RecentZtFilter(l)
 	//view.Plot(l[0])
 
