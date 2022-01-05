@@ -80,7 +80,7 @@ func RiKCode(code string) []*RiKUnit {
 		fmt.Println("timespend:", timeSpend," for web visit time interval:", webVisitInterval, "last:", lastWebVisitTime)
 		if timeSpend < webVisitInterval{
 			fmt.Println("sleep for web visit time interval:", webVisitInterval)
-			time.Sleep(webVisitInterval)
+			time.Sleep(webVisitInterval - timeSpend)
 		}
 
 		resp, err := http.Get(RikUrl)

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"faya/function"
+	"faya/strategy"
 	"fmt"
 	//sadas
 )
@@ -10,6 +10,8 @@ import (
 
 func main() {
 	fmt.Println("vim-go")
+	//function.Prefill()
+
 	//view.PlotRik("300949")
 
   	//l := list.Get()
@@ -26,10 +28,8 @@ func main() {
 // 	list.GetBkCode("301111")
  	//list.MinCode("301111")
 // 	strategy.ZtReview()
-
-
 // 	strategy.Day5Viewer()
-	function.Prefill()
+	strategy.LianXuXiaoYangXian()
 
 	/*
 	a := list.RiKCode("300364")
