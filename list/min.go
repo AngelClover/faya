@@ -55,7 +55,7 @@ type MinResponse struct {
 	Data *MinDetails `json:"data"`     // data can be null in return
 }
 
-func isOpeningTime() bool {
+func IsOpeningTime() bool {
 	loc := time.FixedZone("UTC+8", +8*60*60)
 	now := time.Now()
 
@@ -144,7 +144,7 @@ func MinCode(code string) []*MinUnit {
 		}
 		
 		content = body
-		if !isOpeningTime(){
+		if !IsOpeningTime(){
 			db.Insert(cacheKey, string(body))
 		}
 	}

@@ -14,17 +14,17 @@ import (
 
 
 func RealtimeMinCode(code string) []*MinUnit {
-	fmt.Println("list.RealtimeMinCode(", code)
+// 	fmt.Println("list.RealtimeMinCode(", code)
 
-	if !isOpeningTime() {
+	if !IsOpeningTime() {
 		fmt.Println("called the wrong api, it is not opening hour now")
 		return nil
 	}
 
 	timeSpend := time.Since(lastRealtimeApiVisitTime)
-	fmt.Println("timespend:", timeSpend," for realtime api visit time interval:", realtimeApiInterval, "last:", lastRealtimeApiVisitTime)
+// 	fmt.Println("timespend:", timeSpend," for realtime api visit time interval:", realtimeApiInterval, "last:", lastRealtimeApiVisitTime)
 	if timeSpend < realtimeApiInterval{
-		fmt.Println("sleep for realtime api visit time interval:", realtimeApiInterval)
+// 		fmt.Println("sleep for realtime api visit time interval:", realtimeApiInterval)
 		time.Sleep(realtimeApiInterval - timeSpend)
 	}
 
@@ -33,7 +33,7 @@ func RealtimeMinCode(code string) []*MinUnit {
 	resp, err := http.Get(MinUrl)
 	// 	 	fmt.Println(resp)
 
-	lastWebVisitTime = time.Now()
+	lastRealtimeApiVisitTime = time.Now()
 	if err != nil {
 		fmt.Println("http.get error", MinUrl, err)
 		return nil

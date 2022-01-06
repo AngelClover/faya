@@ -38,6 +38,13 @@ func GetZtDaysCount(o *list.TimeObject, rklist []*list.RiKUnit) int {
 			ret = j
 		}
 	}
+	mztc := 0
+	for i := ll - 1; i >= 0; i = i - 1 {
+		if rklist[i].Features["ZtDaysCount"].(int) > mztc {
+			mztc = rklist[i].Features["ZtDaysCount"].(int)
+		}
+		rklist[i].Features["MaxZtCount"] = mztc
+	}
 	return ret 
 }
 func GetZtDaysCountEx(o *list.TimeObject, rklist []*list.RiKUnit) (int,int) {

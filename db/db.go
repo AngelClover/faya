@@ -118,13 +118,29 @@ func Get(key string) (string, bool) {
 		now := time.Now()
 		yn, mn, dn := now.Date()
 		yr, mr, dr := cc.Tm.Date()
+		loc := time.FixedZone("UTC+8", +8*60*60)
+
+		startTime := time.Date(yn, mn, dn, 9, 15, 0, 0, loc)
+		endTime := time.Date(yn, mn, dn, 15, 0, 0, 0, loc)
+		
+		//cc.Tm < now < starTime
+		if startTime.After(now) {
+			now = now.AddDate(0, 0, -1)
+			yn, mn, dn = now.Date()
+
+			if (cc.Tm.After(now)) {
+				return cc.Content, true
+			}
+		}
+
+
+
 		if yn != yr || mn != mr || dn != dr {
 			fmt.Println("db find content for key:", key, " but it is the date:", cc.Tm)
 			return "", false
 		}
 		//add same day expire judge
-		loc := time.FixedZone("UTC+8", +8*60*60)
-		endTime := time.Date(yn, mn, dn, 15, 0, 0, 0, loc)
+		//cc.Tm < endTime < now
 		if endTime.After(cc.Tm) && now.After(endTime) {
 			return "", false
 		}

@@ -20,6 +20,7 @@ type ZtD struct {
 	Firstfb string
 	Lastfb string
 	Turnover float64
+	RecentTurnover float64
 	ExDays int
 	ExZt int
 }
@@ -71,6 +72,7 @@ func ZtReview() {
 		a := list.RiKCodeReverse(op.Code)
 		ztdayscount := features.GetZtDaysCount(op, a)
 		exdays, exzt := features.GetZtDaysCountEx(op, a)
+		features.GetRecentTurnover(a)
 		fzt := "no"
 		lzt := "no"
 		if len(a) > 0 && ztdayscount > 0 {
@@ -97,6 +99,7 @@ func ZtReview() {
 			d.Firstfb = fzt
 			d.Lastfb = lzt
 			d.Turnover = a[0].Turnover
+			d.RecentTurnover = a[0].Features["RecentTurnover"].(float64)
 			d.ExDays = exdays
 			d.ExZt = exzt
 
@@ -125,7 +128,7 @@ func ZtReview() {
 			str = "成功"
 		}
 		exstr := ""
-		if o.ExDays >= 0 && o.ExDays >= 0 {
+		if o.ExDays >= 0 && o.ExZt >= 0 && o.ExDays != o.ExZt {
 			exstr = strconv.Itoa(o.ExDays + 1) + "days" + strconv.Itoa(o.ExZt + 1) + "zt"
 		}
 		fmt.Printf("%s %s ^ %d进%d%s %s %f |%s %s| %s \n", o.Code, o.Name, o.Days, o.Days+1, str, exstr, o.Det, o.Firstfb, o.Lastfb, list.GetBkCode(o.Code))

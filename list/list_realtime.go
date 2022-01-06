@@ -6,8 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
-
-	"github.com/gogf/gf/os/gtime"
 )
 
 var (
@@ -17,10 +15,10 @@ var (
 
 //realtime api need no cache
 func GetRealtimeList() []*TimeObject {
-	fmt.Println("list.GetRealtimeList(")
+// 	fmt.Println("list.GetRealtimeList(")
 
 
-	if !isOpeningTime() {
+	if !IsOpeningTime() {
 		fmt.Println("called the wrong api, it is not opening hour now")
 		return nil
 	}
@@ -28,14 +26,16 @@ func GetRealtimeList() []*TimeObject {
 
 
 	timeSpend := time.Since(lastRealtimeApiVisitTime)
-	fmt.Println("timespend:", timeSpend," for realtime api visit time interval:", realtimeApiInterval, "last:", lastRealtimeApiVisitTime)
+// 	fmt.Println("timespend:", timeSpend," for realtime api visit time interval:", realtimeApiInterval, "last:", lastRealtimeApiVisitTime)
 	if timeSpend < realtimeApiInterval{
-		fmt.Println("sleep for realtime api visit time interval:", realtimeApiInterval)
+// 		fmt.Println("sleep for realtime api visit time interval:", realtimeApiInterval)
 		time.Sleep(realtimeApiInterval - timeSpend)
 	}
 
 
 	resp, err := http.Get(listUrl)
+	lastRealtimeApiVisitTime = time.Now()
+
 	if err != nil {
 		fmt.Println("http.get error", listUrl)
 		return nil
@@ -61,15 +61,15 @@ func GetRealtimeList() []*TimeObject {
 		return nil
 	}
 
-	writeTime := gtime.Now()
-	contentTime, err := getDataTime(writeTime)
-	fmt.Println("get content time:", contentTime)
+// 	writeTime := gtime.Now()
+// 	contentTime, err := getDataTime(writeTime)
+// 	fmt.Println("get content time:", contentTime)
 
 	for _, obj := range resp2.Data.Diff {
 		//fmt.Println(obj)
 		test(obj)
 	}
-	fmt.Println("get list length:", len(resp2.Data.Diff))
+// 	fmt.Println("get list length:", len(resp2.Data.Diff))
 	return resp2.Data.Diff
 
 }

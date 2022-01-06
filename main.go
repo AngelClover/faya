@@ -1,6 +1,8 @@
 package main
 
 import (
+	"faya/filter"
+	"faya/list"
 	"faya/strategy"
 	"fmt"
 	//sadas
@@ -10,20 +12,21 @@ import (
 
 func main() {
 	fmt.Println("vim-go")
-	//function.Prefill()
+// 	function.Prefill()
 
 	//view.PlotRik("300949")
 
-  	//l := list.Get()
-// 	//l = filter.Filter300(l)
+  	l := list.Get()
+// 	l = filter.Filter300(l)
+	l = filter.HoldFilter(l)
+
 // 	l = filter.RecentZtFilter(l)
 // 	//view.Plot(l[0])
-/*
 	for _, o := range l{
 		fmt.Println(o)
-		list.GetBkCode(o.Code)
+		//list.GetBkCode(o.Code)
 	}
-	*/
+// 	function.Chi(l)
 
 // 	list.GetBkCode("301111")
  	//list.MinCode("301111")
