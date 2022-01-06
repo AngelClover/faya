@@ -27,9 +27,9 @@ func main() {
 
 // 	list.GetBkCode("301111")
  	//list.MinCode("301111")
-// 	strategy.ZtReview()
+	strategy.ZtReview()
 // 	strategy.Day5Viewer()
-	strategy.LianXuXiaoYangXian()
+// 	strategy.LianXuXiaoYangXian()
 
 	/*
 	a := list.RiKCode("300364")

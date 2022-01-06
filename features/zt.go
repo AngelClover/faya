@@ -40,6 +40,19 @@ func GetZtDaysCount(o *list.TimeObject, rklist []*list.RiKUnit) int {
 	}
 	return ret 
 }
+func GetZtDaysCountEx(o *list.TimeObject, rklist []*list.RiKUnit) (int,int) {
+	ll := GetZtDays(o, rklist)
+	d := -1
+	zt := -1
+	for i := 0; i < len(ll); i = i + 1 {
+		if ll[i] - i < 2 {
+			d = ll[i]
+			zt = i
+		}
+	}
+	return d, zt
+}
+
 
 func getTime(str string) string {
 	ll := strings.Split(str, " ")

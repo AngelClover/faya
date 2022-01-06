@@ -6,6 +6,7 @@ import (
 	"faya/list"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -19,6 +20,8 @@ type ZtD struct {
 	Firstfb string
 	Lastfb string
 	Turnover float64
+	ExDays int
+	ExZt int
 }
 
 func ZtViewer() {
@@ -67,6 +70,7 @@ func ZtReview() {
 	for _, op := range l {
 		a := list.RiKCodeReverse(op.Code)
 		ztdayscount := features.GetZtDaysCount(op, a)
+		exdays, exzt := features.GetZtDaysCountEx(op, a)
 		fzt := "no"
 		lzt := "no"
 		if len(a) > 0 && ztdayscount > 0 {
@@ -93,6 +97,8 @@ func ZtReview() {
 			d.Firstfb = fzt
 			d.Lastfb = lzt
 			d.Turnover = a[0].Turnover
+			d.ExDays = exdays
+			d.ExZt = exzt
 
 			zto = append(zto, d)
 		}
@@ -118,6 +124,10 @@ func ZtReview() {
 		if o.Succ {
 			str = "成功"
 		}
-		fmt.Printf("%s %s ^ %d进%d%s %f |%s %s| %s \n", o.Code, o.Name, o.Days, o.Days+1, str, o.Det, o.Firstfb, o.Lastfb, list.GetBkCode(o.Code))
+		exstr := ""
+		if o.ExDays >= 0 && o.ExDays >= 0 {
+			exstr = strconv.Itoa(o.ExDays + 1) + "days" + strconv.Itoa(o.ExZt + 1) + "zt"
+		}
+		fmt.Printf("%s %s ^ %d进%d%s %s %f |%s %s| %s \n", o.Code, o.Name, o.Days, o.Days+1, str, exstr, o.Det, o.Firstfb, o.Lastfb, list.GetBkCode(o.Code))
 	}
 }
