@@ -16,7 +16,7 @@ import (
 func RealtimeMinCode(code string) []*MinUnit {
 // 	fmt.Println("list.RealtimeMinCode(", code)
 
-	if !IsOpeningTime() {
+	if !mockOpeningTime && !IsOpeningTime() {
 		fmt.Println("called the wrong api, it is not opening hour now")
 		return nil
 	}

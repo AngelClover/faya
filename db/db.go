@@ -125,14 +125,18 @@ func Get(key string) (string, bool) {
 		
 		//cc.Tm < now < starTime
 		if startTime.After(now) {
-			now = now.AddDate(0, 0, -1)
-			yn, mn, dn = now.Date()
+			noww := now.AddDate(0, 0, -1)
+			//yn, mn, dn = noww.Date()
+			endd := endTime.AddDate(0, 0, -1)
 
-			if (cc.Tm.After(now)) {
+			if (cc.Tm.After(noww) && cc.Tm.After(endd)) {
+// 				fmt.Println(key, "expire 1", noww, "<", cc.Tm)
+// 				fmt.Println(key, "expire 1", endd, "<", cc.Tm)
 				return cc.Content, true
 			}
 		}
 
+		//(data time, now) (yesterday noon, morning)
 
 
 		if yn != yr || mn != mr || dn != dr {
@@ -142,6 +146,7 @@ func Get(key string) (string, bool) {
 		//add same day expire judge
 		//cc.Tm < endTime < now
 		if endTime.After(cc.Tm) && now.After(endTime) {
+				fmt.Println(key, "expire 3")
 			return "", false
 		}
 	}

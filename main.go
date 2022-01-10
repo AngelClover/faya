@@ -1,9 +1,9 @@
 package main
 
 import (
-	"faya/filter"
-	"faya/list"
-	"faya/strategy"
+	// 	"faya/strategy"
+
+	"faya/function"
 	"fmt"
 	//sadas
 )
@@ -11,26 +11,38 @@ import (
 //Faya
 
 func main() {
-	fmt.Println("vim-go")
+	fmt.Println("faya")
 // 	function.Prefill()
+	function.TuishiProducer()
 
-	//view.PlotRik("300949")
+	//view.PlotRik("300949", "2022-01-06")
+// 	view.PlotRik("300949")
 
-  	l := list.Get()
+//   	l := list.Get()
+// 	l = filter.HoldFilter(l)
 // 	l = filter.Filter300(l)
-	l = filter.HoldFilter(l)
 
 // 	l = filter.RecentZtFilter(l)
 // 	//view.Plot(l[0])
-	for _, o := range l{
-		fmt.Println(o)
-		//list.GetBkCode(o.Code)
-	}
 // 	function.Chi(l)
+
+
+/*
+	for _, o := range l{
+		//list.GetBkCode(o.Code)
+		p := list.RiKCodeReverse(o.Code)
+		if len(p) <= 0 || p[0].Date != "2022-01-10" {
+			fmt.Println(o)
+			if len(p) > 1 {
+				fmt.Println(p[0])
+			}
+		}
+	}
+ 	*/
 
 // 	list.GetBkCode("301111")
  	//list.MinCode("301111")
-	strategy.ZtReview()
+// 	strategy.ZtReview()
 // 	strategy.Day5Viewer()
 // 	strategy.LianXuXiaoYangXian()
 

@@ -11,6 +11,7 @@ import (
 var (
 	lastRealtimeApiVisitTime = time.Now()
 	realtimeApiInterval = 1000 * time.Millisecond
+	mockOpeningTime = true
 )
 
 //realtime api need no cache
@@ -18,7 +19,7 @@ func GetRealtimeList() []*TimeObject {
 // 	fmt.Println("list.GetRealtimeList(")
 
 
-	if !IsOpeningTime() {
+	if !mockOpeningTime && !IsOpeningTime() {
 		fmt.Println("called the wrong api, it is not opening hour now")
 		return nil
 	}
