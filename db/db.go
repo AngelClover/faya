@@ -86,10 +86,11 @@ func Get(key string) (string, bool) {
 		fmt.Println("key:", key, "does not exist")
 		return "", false
 	} else if err != nil {
-		fmt.Println("cannot found out", key, "should panic")
+		fmt.Println("cannot found out", key, "should panic", err)
+// 		panic(key + "not found")
 		//return "", false
 	}
-// 	fmt.Println("cache key:", key, "content:", val)
+//  	fmt.Println("cache key:", key, "content:", val)
 
 	if len(val) < 3{
 		fmt.Println("cache key:", key, "content:", val, "len:", len(val))

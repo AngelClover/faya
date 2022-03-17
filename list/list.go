@@ -97,57 +97,67 @@ func test(obj interface{})interface{}{
 
 func Get() []*TimeObject {
 	fmt.Println("list.Get(")
-	nosql := true
+	listlen := 0
+
 	
-	cacheKey := "list"
-	contentStr, had := db.Get(cacheKey)
-	var content []byte 
-	if had == true {
-		content = []byte(contentStr)
-	} else {
-		resp, err := http.Get(listUrl)
+	for ;listlen < 4000; {
+		nosql := true
+
+		cacheKey := "list"
+		contentStr, had := db.Get(cacheKey)
+		var content []byte 
+		if had == true {
+			content = []byte(contentStr)
+		} else {
+			resp, err := http.Get(listUrl)
+			if err != nil {
+				fmt.Println("http.get error", listUrl)
+				return nil
+			}
+			defer resp.Body.Close()
+
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				fmt.Println("ioutil.readAll error", resp.Body)
+				return nil
+			}
+
+			if resp.StatusCode > 299 {
+				fmt.Println("Response failed with status code: %d and\nbody: %s\n", resp.StatusCode, body)
+				return nil
+				//return body, errors.New(strconv.Itoa(resp.StatusCode))
+			}
+			content = body
+			//bodyStr := string(body)
+			db.Insert(cacheKey, string(body))
+
+		}
+
+		var resp2 TimeListWrapper
+		err := json.Unmarshal(content, &resp2)
 		if err != nil {
-			fmt.Println("http.get error", listUrl)
-			return nil
-		}
-		defer resp.Body.Close()
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Println("ioutil.readAll error", resp.Body)
+			fmt.Println("json unmarshal error : " + err.Error())
 			return nil
 		}
 
-		if resp.StatusCode > 299 {
-			fmt.Println("Response failed with status code: %d and\nbody: %s\n", resp.StatusCode, body)
-			return nil
-			//return body, errors.New(strconv.Itoa(resp.StatusCode))
+		writeTime := gtime.Now()
+		contentTime, err := getDataTime(writeTime)
+		fmt.Println("get content time:", contentTime)
+
+		for _, obj := range resp2.Data.Diff {
+			//fmt.Println(obj)
+			test(obj)
+			if nosql {
+			}
 		}
-		content = body
-		//bodyStr := string(body)
-		db.Insert(cacheKey, string(body))
-
-	}
-
-	var resp2 TimeListWrapper
-	err := json.Unmarshal(content, &resp2)
-	if err != nil {
-		fmt.Println("json unmarshal error : " + err.Error())
-		return nil
-	}
-
-	writeTime := gtime.Now()
-	contentTime, err := getDataTime(writeTime)
-	fmt.Println("get content time:", contentTime)
-
-	for _, obj := range resp2.Data.Diff {
-		//fmt.Println(obj)
-		test(obj)
-		if nosql {
+		fmt.Println("get list length:", len(resp2.Data.Diff))
+		listlen = len(resp2.Data.Diff)
+		if listlen > 4000 {
+			return resp2.Data.Diff
 		}
 	}
-	fmt.Println("get list length:", len(resp2.Data.Diff))
-	return resp2.Data.Diff
+	return nil
+	
 }
 
 func GetObj(str string) TimeObject{

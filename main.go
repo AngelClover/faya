@@ -3,8 +3,15 @@ package main
 import (
 	// 	"faya/strategy"
 
+	"faya/filter"
 	"faya/function"
+	"faya/list"
+	"faya/strategy"
+	"faya/view"
 	"fmt"
+	"os"
+	"strconv"
+	"time"
 	//sadas
 )
 
@@ -12,19 +19,61 @@ import (
 
 func main() {
 	fmt.Println("faya")
-// 	function.Prefill()
-	function.TuishiProducer()
+	fmt.Println(os.Args)
+	if len(os.Args) < 2{
+		fmt.Println("help")
+		return
+	}
+	switch os.Args[1] {
+	case "prefill":
+		fmt.Println("prefill")
+		function.Prefill()
+	case "review":
+		strategy.ZtReview()
+		strategy.Day5DowngradeViewer()
+	case "chi":
+		l := list.Get()
+		l = filter.HoldFilter(l)
+		function.Chi(l)
+	case "view":
+		code := os.Args[2]
+		view.PlotRik(code)
+	case "bigchi":
+		fmt.Println("bigchi")
+	case "dingban":
+		fmt.Println("dingban")
+		function.Dingban()
+	case "history":
+		fmt.Println("hisotry zt review")
+		// TODO remember to correct the timezone and when you exec it before opening time
+		now := time.Now()
+		targetDate := now
+		if len(os.Args) > 2 {
+			det, err := strconv.Atoi(os.Args[2])
+			if err != nil {
+				panic(err)
+			}
+			targetDate = now.AddDate(0, 0, det)
+		}
+		y, m, d := targetDate.Date()
+		tm := fmt.Sprintf("%d-%02d-%02d", y, m, d)
+		fmt.Println("hisotry zt review", now, "targetTm:", tm)
 
-	//view.PlotRik("300949", "2022-01-06")
-// 	view.PlotRik("300949")
+		strategy.HistoryZtReview(tm)
 
-//   	l := list.Get()
-// 	l = filter.HoldFilter(l)
+	default:
+		fmt.Println("default", os.Args)
+	}
+
+
+	//function.TuishiProducer()
+// 
+// 	view.PlotMin("000665", "2022-01-12")
+
 // 	l = filter.Filter300(l)
 
 // 	l = filter.RecentZtFilter(l)
 // 	//view.Plot(l[0])
-// 	function.Chi(l)
 
 
 /*
@@ -42,7 +91,6 @@ func main() {
 
 // 	list.GetBkCode("301111")
  	//list.MinCode("301111")
-// 	strategy.ZtReview()
 // 	strategy.Day5Viewer()
 // 	strategy.LianXuXiaoYangXian()
 

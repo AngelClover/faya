@@ -16,7 +16,7 @@ var (
 
 //realtime api need no cache
 func GetRealtimeList() []*TimeObject {
-// 	fmt.Println("list.GetRealtimeList(")
+//  	fmt.Println("list.GetRealtimeList(")
 
 
 	if !mockOpeningTime && !IsOpeningTime() {
