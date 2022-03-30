@@ -40,9 +40,27 @@ func main() {
 		view.PlotRik(code)
 	case "bigchi":
 		fmt.Println("bigchi")
+		fmt.Println("ensure time now is in opening time")
+		now := time.Now()
+		targetDate := now
+		if len(os.Args) > 2 {
+			det, err := strconv.Atoi(os.Args[2])
+			if err != nil {
+				panic(err)
+			}
+			targetDate = now.AddDate(0, 0, det)
+		}
+		y, m, d := targetDate.Date()
+		tm := fmt.Sprintf("%d-%02d-%02d", y, m, d)
+		fmt.Println("hisotry zt review", now, "targetTm:", tm)
+		ar := strategy.HistoryZtOnly(tm)
+		function.ShowChi(ar)
 	case "dingban":
 		fmt.Println("dingban")
-		function.Dingban()
+		//function.Dingban()
+	case "dingpan":
+		fmt.Println("dingpan")
+
 	case "history":
 		fmt.Println("hisotry zt review")
 		// TODO remember to correct the timezone and when you exec it before opening time

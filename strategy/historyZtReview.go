@@ -6,7 +6,6 @@ import (
 	"faya/list"
 	"fmt"
 	"sort"
-	"strconv"
 )
 
 /*
@@ -36,7 +35,7 @@ func ZtViewer() {
 }
 */
 
-func HistoryZtReview(tm string) {
+func HistoryZtReview(tm string) []ZtD {
 	fmt.Println("tm:", tm)
 	l := list.Get()
 	l = filter.LajiFilter(l)
@@ -79,6 +78,7 @@ func HistoryZtReview(tm string) {
 			d.RecentTurnover = a[0].Features["RecentTurnover"].(float64)
 			d.ExDays = exdays
 			d.ExZt = exzt
+			d.Date = tm
 
 			zto = append(zto, d)
 		}
@@ -92,10 +92,6 @@ func HistoryZtReview(tm string) {
 
 	})
 	/*
-	for _, o := range zto {
-		fmt.Printf("%s %s ^ %d zt\n", o.Code, o.Name, o.Days)
-	}
-	*/
 	for i := 0; i < len(zto); i = i + 1 {
 		if i > 1 && zto[i].Days != zto[i - 1].Days {
 			fmt.Print("\n")
@@ -111,4 +107,16 @@ func HistoryZtReview(tm string) {
 		}
 		fmt.Printf("%s %s ^ %d进%d%s %s %f |%s %s| %s \n", o.Code, o.Name, o.Days, o.Days+1, str, exstr, o.Det, o.Firstfb, o.Lastfb, list.GetBkCode(o.Code))
 	}
+	*/
+	return zto
+}
+func HistoryZtOnly(tm string) []ZtD{
+	a := HistoryZtReview(tm)
+	ret := make([]ZtD, 0)
+	for _, x := range a {
+		if x.Succ {
+			ret = append(ret, x)
+		}
+	}
+	return ret
 }

@@ -203,7 +203,7 @@ func RiKCodeReverse(code string) []*RiKUnit {
 	return rev
 }
 func RiKCodeReverseBefore(code string, tm string) []*RiKUnit {
-// 	fmt.Println(code, "Before tm:", tm)
+ 	//fmt.Println(code, "Before tm:", tm)
 	ret := RiKCode(code)
 	rev := make([]*RiKUnit, 0)
 	dtm, err := time.Parse(time.RFC3339, tm + "T15:04:05Z")
@@ -213,7 +213,7 @@ func RiKCodeReverseBefore(code string, tm string) []*RiKUnit {
 	}
 	for i := len(ret) - 1; i >= 0; i = i - 1 {
 		d1, _ := time.Parse(time.RFC3339, ret[i].Date + "T15:04:05Z")
-// 		fmt.Println("data:", d1, " now:", dtm)
+ 	//	fmt.Println("data:", d1, " now:", dtm)
 		if d1.Before(dtm) {
 			rev = append(rev, ret[i])
 		}

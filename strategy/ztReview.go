@@ -23,6 +23,7 @@ type ZtD struct {
 	RecentTurnover float64
 	ExDays int
 	ExZt int
+	Date string
 }
 
 func ZtViewer() {
