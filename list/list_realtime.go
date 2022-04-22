@@ -76,7 +76,7 @@ func GetRealtimeList() []*TimeObject {
 }
 
 //TODO: optimizing
-func GetRealtimeInfo(li []*TimeObject) []*TimeObject{
+func GetRealtimeInfo(li []*TimeObject) ([]*TimeObject, []*TimeObject){
 	l := GetRealtimeList()
 	ret := make([]*TimeObject, 0)
 	for _,o := range li {
@@ -93,5 +93,5 @@ func GetRealtimeInfo(li []*TimeObject) []*TimeObject{
 			ret = append(ret, j)
 		}
 	}
-	return ret
+	return ret, l
 }

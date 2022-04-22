@@ -60,6 +60,10 @@ func main() {
 		//function.Dingban()
 	case "dingpan":
 		fmt.Println("dingpan")
+	case "fengdan":
+		fmt.Println("fengdan")
+		list.FengdanCode("600180")
+
 
 	case "history":
 		fmt.Println("hisotry zt review")

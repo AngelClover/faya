@@ -2,6 +2,7 @@ package function
 
 import (
 	"faya/features"
+	"faya/filter"
 	"faya/list"
 	"faya/strategy"
 	"fmt"
@@ -17,7 +18,7 @@ func Chi(l []*list.TimeObject) {
 	for ;mockOpeningTime || list.IsOpeningTime() ; time.Sleep(5 * time.Second){
 		fmt.Println("------------------")
 		//lr := list.GetRealtimeList()
-		ll := list.GetRealtimeInfo(l)
+		ll, _ := list.GetRealtimeInfo(l)
 		
 		for _, o := range ll{
 			lm := list.RealtimeMinCode(o.Code)
@@ -51,19 +52,27 @@ func Show(l []strategy.ZtD){
 }
 
 func ShowChi(lz []strategy.ZtD){
-	l := make([]*list.TimeObject, 0)
+	longtoulist := make([]*list.TimeObject, 0)
 	for _,o := range lz {
 		//test filter
 		if o.Days > 1 {
 			var x list.TimeObject
 			x.Code = o.Code
-			l = append(l, &x)
+			longtoulist = append(longtoulist, &x)
 		}
 	}
-	for ;mockOpeningTime || list.IsOpeningTime() ; time.Sleep(5 * time.Second){
+	//for hold list
+	for _,o := range filter.Holdlist{
+		var x list.TimeObject
+		x.Code = o
+		longtoulist = append(longtoulist, &x)
+	}
+	for ;mockOpeningTime || list.IsOpeningTime() ; time.Sleep(20 * time.Second){
 		fmt.Println("------------------")
+		fmt.Println(time.Now().In(time.FixedZone("UTC+8", +8*60*60)))
+
 		//lr := list.GetRealtimeList()
-		ll := list.GetRealtimeInfo(l)
+		ll, fullsetList := list.GetRealtimeInfo(longtoulist)
 		
 		lastztdays := -1
 		for _, o := range ll{
@@ -71,7 +80,26 @@ func ShowChi(lz []strategy.ZtD){
 			rk := list.RiKCodeReverse(o.Code)
 			features.GetRecentTurnover(rk)
 			rto := rk[0].Features["RecentTurnover"].(float64)
-			rtop :=  (o.Turnover).(float64) / rto * 100.0
+			//rtop :=  (o.Turnover).(float64) / rto * 100.0
+			var rtop float64
+			ro, ok :=(o.Turnover).(float64) 
+			if ok {
+				rtop = ro / rto * 100
+			} else {
+				ro = 0
+				rtop = 0
+			}
+
+			am, ok :=(o.Amount).(float64) 
+			if !ok {
+				am = 0
+			}
+
+			mo, ok :=(o.Money).(float64) 
+			if !ok {
+				mo = 0
+			}
+
 
 			ztdays := func () int{
 				for _, oo := range lz{
@@ -81,6 +109,7 @@ func ShowChi(lz []strategy.ZtD){
 				}
 				return 0
 			}()
+
 			if ztdays != lastztdays {
 				fmt.Println("")
 				if lastztdays == -1 {
@@ -99,10 +128,16 @@ func ShowChi(lz []strategy.ZtD){
 					//fmt.Println(o.Code, o.DetP, " | ", o.Turnover, o.Amount.(float64)/1e4, o.Money.(float64)/1e8, " | ", m.Amount, rtop)
 				}
 			} else {
-					fmt.Println(o.Code, o.Name, ztdays, o.DetP, " | ", o.Turnover, o.Amount.(float64)/1e4, o.Money.(float64)/1e8, " | ", rtop)
+					fmt.Println(o.Code, o.Name, ztdays, o.DetP, " | ", ro, am/1e4, mo/1e8, " | ", rtop)
 			}
 
 		}
+
+		fullsetList = filter.LajiFilter(fullsetList)
+		fullsetList = filter.STFilter(fullsetList)
+		strategy.Analysis(fullsetList)
+		fmt.Println(time.Now())
+
 		if mockOpeningTime {
 			break
 		}

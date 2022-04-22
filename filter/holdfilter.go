@@ -3,7 +3,7 @@ package filter
 import "faya/list"
 
 var (
-	holdlist = []string {"002317", "002235", "000852", "000665"}
+	Holdlist = []string {"600180"}
 )
 
 
@@ -11,7 +11,7 @@ func HoldFilter(input []*list.TimeObject) []*list.TimeObject{
 	ret := make([]*list.TimeObject, 0)
 	for _, obj := range input{
 		hold := false
-		for _,j := range holdlist {
+		for _,j := range Holdlist {
 			if j == obj.Code || j == obj.Name {
 				hold = true
 				break

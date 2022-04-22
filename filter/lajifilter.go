@@ -24,3 +24,12 @@ func LajiFilter(input []* list.TimeObject) []*list.TimeObject{
 	}
 	return ret
 }
+func STFilter(input []* list.TimeObject) []*list.TimeObject{
+	ret := make([]*list.TimeObject, 0)
+	for _, o:= range input{
+		if strings.Index(o.Name, "ST") < 0 {
+			ret = append(ret, o)
+		}
+	}
+	return ret
+}
