@@ -148,17 +148,26 @@ func Analysis(l []*list.TimeObject){
 		}
 	}
 	fmt.Println("ztc:", ztc, "  nearztc:", nearztc, "   total:", len(l))
+	var ztQ []*list.TimeObject
 	for _,o := range l{
 		if isZt(o) {
-			OutputAnalysis(o)
+			//OutputAnalysis(o)
+			//fmt.Printf("%s ", o.Name)
+			ztQ = append(ztQ, o)
 		}
 	}
+	showQueue(ztQ, false)
+
 	fmt.Println("------------up6")
+	var nearQ []*list.TimeObject
 	for _,o := range l{
 		if nearZt(o) {
-			OutputAnalysis(o)
+			//OutputAnalysis(o)
+			//fmt.Printf("%s %f ", o.Name, o.DetP)
+			nearQ = append(nearQ, o)
 		}
 	}
+	showQueue(nearQ, true)
 
 	
 	for _, o := range l{

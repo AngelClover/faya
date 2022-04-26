@@ -235,7 +235,10 @@ func FengdanCode(code string) *FengdanUnit{
 		//fmt.Println("sleep for web visit time interval:", webVisitInterval)
 		time.Sleep(webVisitInterval - timeSpend)
 	}
-	resp, err := http.Get(FengdanUrl)
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	resp, err := client.Get(FengdanUrl)
 
 	lastWebVisitTime = time.Now()
 	if err != nil {
