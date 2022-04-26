@@ -15,6 +15,14 @@ type BkStatUnit struct {
 	List []*list.TimeObject
 }
 
+type BkCombinedStatUnit struct {
+	BkName string
+	ZtCount int
+	ZtList []*list.TimeObject
+	NearCount int
+	NearList []*list.TimeObject
+}
+
 
 func showQueue(l []*list.TimeObject, showDet bool) {
 	fmt.Println("showQ(")
@@ -60,4 +68,73 @@ func showQueue(l []*list.TimeObject, showDet bool) {
 
 	}
 	//fmt.Printf("\n")
+}
+func showCombinedQueue(zt []*list.TimeObject, near []*list.TimeObject) {
+	var a []*BkCombinedStatUnit
+	for _,o := range zt{
+		bk := list.GetBk(o)
+		var b *BkCombinedStatUnit = nil
+		for _,x := range a {
+			if x.BkName == bk {
+				b = x
+				break
+			}
+		}
+		if b == nil {
+			b = &BkCombinedStatUnit{
+				BkName: bk,
+				ZtCount: 0,
+				NearCount: 0,
+			}
+			a = append(a, b)
+		}
+		b.ZtCount += 1
+		b.ZtList = append(b.ZtList, o)
+	}
+	for _,o := range near{
+		bk := list.GetBk(o)
+		var b *BkCombinedStatUnit = nil
+		for _,x := range a {
+			if x.BkName == bk {
+				b = x
+				break
+			}
+		}
+		if b == nil {
+			b = &BkCombinedStatUnit{
+				BkName: bk,
+				ZtCount: 0,
+				NearCount: 0,
+			}
+			a = append(a, b)
+		}
+		b.NearCount += 1
+		b.NearList = append(b.NearList, o)
+	}
+
+	sort.Slice(a, func(i, j int) bool {
+		//not stable for ==
+		return a[i].ZtCount > a[j].ZtCount ||
+		a[i].ZtCount == a[j].ZtCount && a[i].NearCount == a[j].NearCount
+	})
+
+	for _,b := range a {
+		//fmt.Println(b)
+		fmt.Printf("%s %d+%d :", b.BkName, b.ZtCount, b.NearCount)
+		for _,x := range b.ZtList {
+			fmt.Printf(" %s", x.Name)
+		}
+		fmt.Printf(" | ")
+		for _,x := range b.NearList {
+			fmt.Printf(" %s %f", x.Name, x.DetP)
+		}
+
+		if b.ZtCount > 1 {
+			fmt.Printf("\n")
+		}else {
+			fmt.Printf(" | ")
+		}
+
+	}
+
 }

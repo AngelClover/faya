@@ -156,9 +156,9 @@ func Analysis(l []*list.TimeObject){
 			ztQ = append(ztQ, o)
 		}
 	}
-	showQueue(ztQ, false)
+	//showQueue(ztQ, false)
 
-	fmt.Println("------------up6")
+	//fmt.Println("------------up6")
 	var nearQ []*list.TimeObject
 	for _,o := range l{
 		if nearZt(o) {
@@ -167,7 +167,8 @@ func Analysis(l []*list.TimeObject){
 			nearQ = append(nearQ, o)
 		}
 	}
-	showQueue(nearQ, true)
+	//showQueue(nearQ, true)
+	showCombinedQueue(ztQ, nearQ)
 
 	
 	for _, o := range l{
@@ -206,11 +207,15 @@ func Analysis(l []*list.TimeObject){
 			//}
 		}
 	}
+	shzone, err := time.LoadLocation("Asia/shanghai")
+	if err != nil {
+		fmt.Println("local time err:", err)
+	}
 	fmt.Println("queue[", head, ",", tail, "]")
 	for i := Max(tail - 10, 0); i < tail; i++ {
 		if Q[i].Message == "feng" {
 			fd := list.FengdanCode(Q[i].Code)
-			fmt.Printf("%v %d(%f) %s ||", Q[i].Time, fd.Buy1, float64(fd.Buy1)*fd.Buy1Price/10000, fd.Bk)
+			fmt.Printf("%v %d(%f) %s ||", Q[i].Time.In(shzone), fd.Buy1, float64(fd.Buy1)*fd.Buy1Price/10000, fd.Bk)
 			for _,o := range l{
 				if o.Code == Q[i].Code {
 					OutputAnalysis(o)
