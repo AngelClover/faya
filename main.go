@@ -24,6 +24,7 @@ func main() {
 		fmt.Println("help")
 		return
 	}
+		
 	switch os.Args[1] {
 	case "prefill":
 		fmt.Println("prefill")
@@ -38,6 +39,23 @@ func main() {
 	case "view":
 		code := os.Args[2]
 		view.PlotRik(code)
+	case "viewmin":
+		code := os.Args[2]
+		now := time.Now()
+		targetDate := now
+		if len(os.Args) > 3 {
+			det, err := strconv.Atoi(os.Args[3])
+			if err != nil {
+				panic(err)
+			}
+			targetDate = now.AddDate(0, 0, det)
+		}
+		y, m, d := targetDate.Date()
+		tm := fmt.Sprintf("%d-%02d-%02d", y, m, d)
+
+		fmt.Println("hisotry zt review", now, "targetTm:", tm)
+
+		view.PlotMin(code, tm)
 	case "bigchi":
 		fmt.Println("bigchi")
 		fmt.Println("ensure time now is in opening time")

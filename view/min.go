@@ -1,9 +1,14 @@
 package view
 
 import (
+	"archive/tar"
+	"bytes"
+	"compress/gzip"
 	"faya/list"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"strconv"
@@ -13,15 +18,103 @@ import (
 	"github.com/pplcc/plotext"
 	"github.com/pplcc/plotext/custplotter"
 	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/font"
+	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg/draw"
 	"gonum.org/v1/plot/vg/vgimg"
+
+	"golang.org/x/image/font/opentype"
 )
 
 func PlotMin(code string, date string){
-	fmt.Println("plot:", code)
+	fmt.Println("plot:", code, date)
 	rikData := list.RiKCode(code)
 	minData := list.MinCode(code)
 	PlotMinDate(list.GetObj(code), rikData, minData)
+}
+func untargz(name string, r io.Reader) ([]byte, error) {
+	gr, err := gzip.NewReader(r)
+	if err != nil {
+		return nil, fmt.Errorf("could not create gzip reader: %v", err)
+	}
+	defer gr.Close()
+
+	tr := tar.NewReader(gr)
+	for {
+		hdr, err := tr.Next()
+		if err != nil {
+			if err == io.EOF {
+				return nil, fmt.Errorf("could not find %q in tar archive", name)
+			}
+			return nil, fmt.Errorf("could not extract header from tar archive: %v", err)
+		}
+
+		if hdr == nil || hdr.Name != name {
+			continue
+		}
+
+		buf := new(bytes.Buffer)
+		_, err = io.Copy(buf, tr)
+		if err != nil {
+			return nil, fmt.Errorf("could not extract %q file from tar archive: %v", name, err)
+		}
+		return buf.Bytes(), nil
+	}
+}
+
+func addFont(){
+	/*
+	fontName := "simhei"
+	ttfBytes, err := ioutil.ReadFile("../font/SimHei.ttf")
+	if err != nil {
+		fmt.Println("read ttf file error:", err)
+	}
+    font, err := truetype.Parse(ttfBytes)
+	if err != nil {
+		fmt.Println("truetype parse ttf file error:", err)
+	}
+	simhei := font.Font{Typeface: "simhei"}
+	font.DefaultCache.Add([]font.Face{
+		{
+			Font: simhei,
+			Face: fontTTF,
+		},
+	})
+	//vg.AddFont(fontName, font)
+    plot.DefaultFont = simhei
+    plotter.DefaultFont = simhei
+	*/
+		// download font from debian
+	const url = "http://http.debian.net/debian/pool/main/f/fonts-ipafont/fonts-ipafont_00303.orig.tar.gz"
+
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatalf("could not download IPA font file: %+v", err)
+	}
+	defer resp.Body.Close()
+
+	ttf, err := untargz("IPAfont00303/ipam.ttf", resp.Body)
+	if err != nil {
+		log.Fatalf("could not untar archive: %+v", err)
+	}
+
+	fontTTF, err := opentype.Parse(ttf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	mincho := font.Font{Typeface: "Mincho"}
+	font.DefaultCache.Add([]font.Face{
+		{
+			Font: mincho,
+			Face: fontTTF,
+		},
+	})
+	if !font.DefaultCache.Has(mincho) {
+		log.Fatalf("no font %q!", mincho.Typeface)
+	}
+	plot.DefaultFont = mincho
+	plotter.DefaultFont = mincho
+
 }
 func PlotMinDate(o list.TimeObject, data []*list.RiKUnit, min []*list.MinUnit) {
 	//test(data)
@@ -76,9 +169,13 @@ func PlotMinDate(o list.TimeObject, data []*list.RiKUnit, min []*list.MinUnit) {
 	}
 
 	fmt.Println(o)
+
+	//support chinese word in title
+	addFont()
+
 	// prepare for p1 rik
 	p1 :=  plot.New()
-	p1.Title.Text = o.Code 
+	p1.Title.Text = o.Code  + " " + o.Name
 
 	p1.X.Tick.Marker = plot.TimeTicks{Format: "2006-01-02\n15:04:05"}
 
@@ -103,7 +200,22 @@ func PlotMinDate(o list.TimeObject, data []*list.RiKUnit, min []*list.MinUnit) {
 	p2.Add(vBars)
 	// prepare for p3 min
 	p3 :=  plot.New()
-	p3.Title.Text = o.Code + "date"
+	rightTitleText := o.Code
+	if len(min) > 1  {
+// 		loc := time.FixedZone("UTC+8", +8*60*60)
+		l := strings.Split(min[0].DateTime, " ")
+		dl := strings.Split(l[0], "-")
+// 		tl := strings.Split(l[1], ":")
+// 		fmt.Println(dl)
+// 		dy, err := strconv.Atoi(dl[0])
+// 		dm, err := strconv.Atoi(dl[1])
+// 		dd, err := strconv.Atoi(dl[2])
+// 		if err != nil {
+// 			fmt.Println(err)
+// 		}
+		rightTitleText += " " + dl[0] + "-" + dl[1] + "-" + dl[2] 
+	}
+	p3.Title.Text = rightTitleText
 
 	p3.X.Tick.Marker = plot.TimeTicks{Format: "2006-01-02\n15:04:05"}
 
@@ -124,7 +236,7 @@ func PlotMinDate(o list.TimeObject, data []*list.RiKUnit, min []*list.MinUnit) {
 		log.Panic(err)
 	}
 	// p2.Y.Padding += (candlesticks.CandleWidth - vBarsmin.LineStyle.Width) / 2
-	p2.Add(vBarsmin)
+	p4.Add(vBarsmin)
 
 
 	// combine p1 and p2
