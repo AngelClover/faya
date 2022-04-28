@@ -102,6 +102,20 @@ func getCacheKeyMin(code string) string {
 
 }
 
+func MinCodeDate(code string, date string) []*MinUnit {
+	cacheKey := code + "min" + date
+	var content []byte
+	contentStr, had := db.Get(cacheKey)
+	if had == true {
+		content = []byte(contentStr)
+	}else {
+		fmt.Println("request MinCodeDate is not in local Cache", code, date)
+		var ret []*MinUnit
+		return ret
+	}
+	return parseMinFromContent(content)
+}
+
 func MinCode(code string) []*MinUnit {
 
 	cacheKey := getCacheKeyMin(code)
@@ -149,6 +163,20 @@ func MinCode(code string) []*MinUnit {
 		}
 	}
 
+	return parseMinFromContent(content)
+}
+func MinCodeReverse(code string) []*MinUnit {
+	ret := MinCode(code)
+	rev := make([]*MinUnit, 0)
+	for i := len(ret) - 1; i >= 0; i = i - 1 {
+		rev = append(rev, ret[i])
+	}
+	return rev
+}
+func Min(obj *TimeObject) []*MinUnit{
+	return MinCode(obj.Code)
+}
+func parseMinFromContent(content []byte) []*MinUnit{
 // 	fmt.Println(content)
 	var resp2 MinResponse
 	err := json.Unmarshal(content, &resp2)
@@ -235,16 +263,4 @@ func MinCode(code string) []*MinUnit {
 // 		fmt.Println(min)
 	}
 	return ret
-
-}
-func MinCodeReverse(code string) []*MinUnit {
-	ret := MinCode(code)
-	rev := make([]*MinUnit, 0)
-	for i := len(ret) - 1; i >= 0; i = i - 1 {
-		rev = append(rev, ret[i])
-	}
-	return rev
-}
-func Min(obj *TimeObject) []*MinUnit{
-	return MinCode(obj.Code)
 }

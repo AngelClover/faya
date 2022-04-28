@@ -107,7 +107,7 @@ func Get(key string) (string, bool) {
 		return "", false
 	}
 	doExpireJudge := true
-	if strings.Index(key, "bk") > 4 {
+	if strings.Index(key, "bk") > 4 || strings.Index(key, "min") > 4{
 		doExpireJudge = false
 	}
 	if doNotCheckTime {

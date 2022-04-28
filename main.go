@@ -38,6 +38,10 @@ func main() {
 		function.Chi(l)
 	case "view":
 		code := os.Args[2]
+		//view.PlotRik(code)
+		view.PlotRikMin(code)
+	case "viewrik":
+		code := os.Args[2]
 		view.PlotRik(code)
 	case "viewmin":
 		code := os.Args[2]
@@ -54,8 +58,8 @@ func main() {
 		tm := fmt.Sprintf("%d-%02d-%02d", y, m, d)
 
 		fmt.Println("hisotry zt review", now, "targetTm:", tm)
-
 		view.PlotMin(code, tm)
+
 	case "bigchi":
 		fmt.Println("bigchi")
 		fmt.Println("ensure time now is in opening time")
