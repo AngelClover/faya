@@ -4,6 +4,7 @@ import (
 	"faya/features"
 	"faya/list"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -95,7 +96,7 @@ func filtered(o *list.TimeObject) bool {
 
 
 func OutputAnalysis(o *list.TimeObject){
-	ztdays := "xx"
+	//ztdays := "xx"
 
 	rk := list.RiKCodeReverse(o.Code)
 	features.GetRecentTurnover(rk)
@@ -128,7 +129,11 @@ func OutputAnalysis(o *list.TimeObject){
 	}
 	//rtop :=  (o.Turnover).(float64) / rto * 100.0
 
-	fmt.Println(o.Code, o.Name, ztdays, o.DetP, " | ", ro,  am/1e4, mo/1e8, " | ", rtop, " | ", ztdayscount)
+	fmt.Printf("%s %s", o.Code, o.Name)
+	if ztdayscount > 0{
+		fmt.Printf("+%d",ztdayscount)
+	}
+	fmt.Println(" | ", ro,  am/1e4, mo/1e8, " | ", rtop)
 
 }
 
@@ -215,7 +220,20 @@ func Analysis(l []*list.TimeObject){
 	for i := Max(tail - 10, 0); i < tail; i++ {
 		if Q[i].Message == "feng" {
 			fd := list.FengdanCode(Q[i].Code)
-			fmt.Printf("%v %d(%f) %s ||", Q[i].Time.In(shzone), fd.Buy1, float64(fd.Buy1)*fd.Buy1Price/10000, fd.Bk)
+			if fd == nil {
+				fmt.Println(Q[i].Code, "get nil")
+				continue
+			}
+
+// 			fmt.Println(Q[i].Time.In(shzone))
+			tms := fmt.Sprintf("%v", Q[i].Time.In(shzone))
+
+// 			fmt.Println(tms)
+
+			tma := strings.Split(tms, " ")
+// 			fmt.Println(tma)
+
+			fmt.Printf("%s %d(%f) %s ||", tma[1], fd.Buy1, float64(fd.Buy1)*fd.Buy1Price*100/10000, fd.Bk)
 			for _,o := range l{
 				if o.Code == Q[i].Code {
 					OutputAnalysis(o)

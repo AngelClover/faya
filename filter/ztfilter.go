@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+//sometimes the target will change to ST, then the limit will change, eg.:2022.4.29 000995
 func ZtJudge(code string, detp float64) bool {
 	if strings.Index(code, "30") == 0 && detp > 19 {
 		return true

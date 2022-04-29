@@ -105,6 +105,20 @@ func main() {
 
 		strategy.HistoryZtReview(tm)
 
+	case "back":
+		now := time.Now()
+		targetDate := now
+		if len(os.Args) > 2 {
+			det, err := strconv.Atoi(os.Args[2])
+			if err != nil {
+				panic(err)
+			}
+			targetDate = now.AddDate(0, 0, det)
+		}
+		y, m, d := targetDate.Date()
+		tm := fmt.Sprintf("%d-%02d-%02d", y, m, d)
+		function.Backtrace(tm)
+
 	default:
 		fmt.Println("default", os.Args)
 	}
