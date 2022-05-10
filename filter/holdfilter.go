@@ -3,7 +3,7 @@ package filter
 import "faya/list"
 
 var (
-	Holdlist = []string {"600161" }
+	Holdlist = []string {"002699", "600180" }
 )
 
 

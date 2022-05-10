@@ -38,8 +38,16 @@ func main() {
 		function.Chi(l)
 	case "view":
 		code := os.Args[2]
+		targetCode := code
+		l := list.Get()
+		for _, x := range l{
+			if x.Code == code || x.Name == code{
+				targetCode = x.Code
+				break
+			}
+		}
 		//view.PlotRik(code)
-		view.PlotRikMin(code)
+		view.PlotRikMin(targetCode)
 	case "viewrik":
 		code := os.Args[2]
 		view.PlotRik(code)
