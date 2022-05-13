@@ -7,6 +7,7 @@ import (
 	"faya/list"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -85,19 +86,38 @@ func addFont(){
     plotter.DefaultFont = simhei
 	*/
 		// download font from debian
-	const url = "http://http.debian.net/debian/pool/main/f/fonts-ipafont/fonts-ipafont_00303.orig.tar.gz"
-	fmt.Println("download font from debian")
-
-	resp, err := http.Get(url)
+	filepath := "ipam.ttf"
+	file, err := os.Open(filepath)
+	var ttf []byte 
 	if err != nil {
-		log.Fatalf("could not download IPA font file: %+v", err)
-	}
-	defer resp.Body.Close()
+		const url = "http://http.debian.net/debian/pool/main/f/fonts-ipafont/fonts-ipafont_00303.orig.tar.gz"
+		fmt.Println("download font from debian")
 
-	ttf, err := untargz("IPAfont00303/ipam.ttf", resp.Body)
-	if err != nil {
-		log.Fatalf("could not untar archive: %+v", err)
+		resp, err := http.Get(url)
+		if err != nil {
+			log.Fatalf("could not download IPA font file: %+v", err)
+		}
+
+		ttf, err = untargz("IPAfont00303/ipam.ttf", resp.Body)
+		if err != nil {
+			log.Fatalf("could not untar archive: %+v", err)
+		}
+
+		err = ioutil.WriteFile(filepath, ttf, 0644)
+		if err != nil {
+			panic(err)
+		}
+
+		defer resp.Body.Close()
+	}else {
+		ttf, err = ioutil.ReadAll(file)
+		if err != nil {
+			panic(err)
+		}
+		
 	}
+	defer file.Close()
+
 
 	fontTTF, err := opentype.Parse(ttf)
 	if err != nil {
