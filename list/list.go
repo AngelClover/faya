@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	listUrl = "http://57.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5000&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:0%2Bt:6,m:0%2Bt:13,m:0%2Bt:80,m:1%2Bt:2,m:1%2Bt:23&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152,f40,f38,f192"
+	listUrl = "http://57.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=6000&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:0%2Bt:6,m:0%2Bt:13,m:0%2Bt:80,m:1%2Bt:2,m:1%2Bt:23&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152,f40,f38,f192"
 )
 
 type TimeObject struct {
