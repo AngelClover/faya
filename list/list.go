@@ -49,6 +49,15 @@ type TimeList struct {
 type TimeListWrapper struct {
 	Data *TimeList `json:"data"`
 }
+func GetContentTime() *gtime.Time {
+	writeTime := gtime.Now()
+	contentTime, err := getDataTime(writeTime)
+	if err != nil {
+		return contentTime
+	} else {
+		return nil
+	}
+}
 
 func getDataTime(t *gtime.Time) (*gtime.Time, error) {
 	res, err := gtime.ConvertZone(t.String(), "Asia/Shanghai")

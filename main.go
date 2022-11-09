@@ -6,9 +6,11 @@ import (
 	"faya/filter"
 	"faya/function"
 	"faya/list"
+	"faya/serve"
 	"faya/strategy"
 	"faya/view"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -26,6 +28,20 @@ func main() {
 	}
 		
 	switch os.Args[1] {
+	case "ss":
+		fmt.Println("ss")
+		code := "1"
+		if len(os.Args) > 2{
+			code = os.Args[2]
+		}
+		if code == "1" {
+			ss := &serve.ServeStrategy1{}
+			ss.Run()
+		} else {
+			fmt.Println("param error")
+			return
+		}
+
 	case "prefill":
 		fmt.Println("prefill")
 		function.Prefill()
@@ -40,14 +56,22 @@ func main() {
 		code := os.Args[2]
 		targetCode := code
 		l := list.Get()
+		holdlist := make([]*list.TimeObject, 0)
 		for _, x := range l{
 			if x.Code == code || x.Name == code{
 				targetCode = x.Code
+				holdlist = append(holdlist, x)
 				break
 			}
 		}
 		//view.PlotRik(code)
 		view.PlotRikMin(targetCode)
+		
+		hl, _:= list.GetRealtimeInfo(holdlist)
+		lz := make([]strategy.ZtD, 0)
+		function.ShowDraft(hl, true, lz)
+
+
 	case "viewrik":
 		code := os.Args[2]
 		view.PlotRik(code)
@@ -126,6 +150,11 @@ func main() {
 		y, m, d := targetDate.Date()
 		tm := fmt.Sprintf("%d-%02d-%02d", y, m, d)
 		function.Backtrace(tm)
+	
+	case "server":
+		mux := &serve.StandStill{}
+		http.ListenAndServe(":8080", mux)
+	
 
 	default:
 		fmt.Println("default", os.Args)

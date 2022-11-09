@@ -106,6 +106,7 @@ func Get(key string) (string, bool) {
 		fmt.Println(val)
 		return "", false
 	}
+	//only rik do the expireJudge
 	doExpireJudge := true
 	if strings.Index(key, "bk") > 4 || strings.Index(key, "min") > 4{
 		doExpireJudge = false
@@ -123,6 +124,12 @@ func Get(key string) (string, bool) {
 
 		startTime := time.Date(yn, mn, dn, 9, 15, 0, 0, loc)
 		endTime := time.Date(yn, mn, dn, 15, 0, 0, 0, loc)
+
+		//in the trading time
+		//do not refresh
+		if startTime.Before(now) && endTime.After(now) {
+			return cc.Content, true
+		}
 		
 		//cc.Tm < now < starTime
 		if startTime.After(now) {
