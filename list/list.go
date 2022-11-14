@@ -53,9 +53,9 @@ func GetContentTime() *gtime.Time {
 	writeTime := gtime.Now()
 	contentTime, err := getDataTime(writeTime)
 	if err != nil {
-		return contentTime
-	} else {
 		return nil
+	} else {
+		return contentTime
 	}
 }
 

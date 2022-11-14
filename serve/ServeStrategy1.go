@@ -98,8 +98,18 @@ type O struct {
 	RecentAmountRatio float64 `json:"ratio"`
 	Bk string `json:"bk"`
 	CheckedDate string `json:"ckdate"`
-	am_now float64 `json:"now"`
-	am_last float64 `json:"last"`
+	AmNow float64 `json:"now"`
+	AmLast float64 `json:"last"`
+	LastLastRatio float64 `json:"llr"` //amount yesterday / before
+	LastLastRatioFlag bool `json:"llrf"`
+
+	WeekAmount int `json:"wa"`
+	LastWeekAmount int `json:"lwa"`
+	WeekAmountRatio float64 `json:"war"`
+	WeekAmountFlag bool `json:"waf"`
+
+	DetP float64 `json:"detp"`
+	DetpFlag bool `json:"detpf"`
 }
 
 func (s *ServeStrategy1) Run() []byte{
@@ -146,23 +156,75 @@ func (s *ServeStrategy1) Run() []byte{
 		//bk := features.GetBk(op)
 		if len(a) > 2{
 			var o O
+			//basic feature
 			o.Code = op.Code
 			o.Name = op.Name
 			o.Bk = ""
 			o.Amount = []int{a[0].Amount, a[1].Amount, a[2].Amount}
+			//daily amount
 			am_now, ok := op.Amount.(float64)
-			o.am_now = am_now
+			o.AmNow = am_now
 			if !ok {
 				//fmt.Println(op.Amount, "->", am_now, "not ok")
-				o.am_now = 0
+				o.AmNow = 0
 			}
-			o.am_last = float64(a[0].Amount)
+			o.AmLast = float64(a[0].Amount)
 			o.CheckedDate = a[0].Date
 			if !isOpening {
-				o.am_last = float64(a[1].Amount)
+				o.AmLast = float64(a[1].Amount)
 				o.CheckedDate = a[1].Date
 			}
-			o.RecentAmountRatio = o.am_now / o.am_last
+			o.RecentAmountRatio = o.AmNow / o.AmLast
+
+			detpt, ok := op.DetP.(float64)
+			if ok{
+				o.DetP = detpt
+			}else {
+				o.DetP = 0
+			}
+			o.LastLastRatio = float64(a[1].Amount) / float64(a[0].Amount)
+			if o.LastLastRatio < 2{
+				o.LastLastRatioFlag = true
+			}else {
+				o.LastLastRatioFlag = false
+			}
+			//depP flag judgement
+			if (o.DetP > -0.01) {
+				o.DetpFlag = true
+			}else {
+				o.DetpFlag = false
+			}
+
+			//weekly amount
+			amt, ok := op.Amount.(float64)
+			if ok {
+				o.WeekAmount = int(amt)
+			}else{
+				o.WeekAmount = 0
+			}
+			for i:=0 ;i < 5 && i < len(a); i++{
+				if i == 0 && isOpening {
+				}else {
+					o.WeekAmount += a[i].Amount
+				}
+			}
+			o.LastWeekAmount = 0
+			for i:=0 ;i < 5 && i+5 < len(a); i++{
+				o.LastWeekAmount += a[i+5].Amount
+			}
+			if o.LastWeekAmount == 0 {
+				o.WeekAmountRatio = 0
+			}else {
+				o.WeekAmountRatio = float64(o.WeekAmount) / float64(o.LastWeekAmount)
+			}
+			if (o.WeekAmountRatio > 1.8){
+				o.WeekAmountFlag = true
+			}else {
+				o.WeekAmountFlag = false
+			}
+
+
+			//put in queue condition
 			if o.RecentAmountRatio >= 2{
 				ans.OO = append(ans.OO, o)
 			}
@@ -182,6 +244,7 @@ func (s *ServeStrategy1) Run() []byte{
 		return ans.OO[i].RecentAmountRatio > ans.OO[j].RecentAmountRatio
 	})
 
+	fmt.Println("OO length:", len(ans.OO))
 
 	AmountRatioHeadPrint(ans.OO)
 	//fmt.Println(ans)
@@ -202,17 +265,15 @@ func (s *ServeStrategy1) Run() []byte{
 
 func AmountRatioHeadPrint(oo [] O){
 	counter := 0
-	counterlimit := 10000
+	counterlimit := 10
 	for _, o := range oo{
 		//fmt.Printf("%s %s %s %v => %.2f %.2f %.2f  ||%.2f|| %.2f %.2f %.2f %s\n", o.Code, o.Name, o.Bk, o.Ztdays, o.Detp[2], o.Detp[1], o.Detp[0], o.RecentTO,  o.Turnover[2], o.Turnover[1], o.Turnover[0], flag)
-		fmt.Printf("%s %s %s %v %s | %f -> %f\n", o.Code, o.Name, o.Bk, o.RecentAmountRatio, o.CheckedDate, o.am_last, o.am_now )
+		fmt.Printf("%s %s %s %v %s | %f -> %f\n", o.Code, o.Name, o.Bk, o.RecentAmountRatio, o.CheckedDate, o.AmLast, o.AmNow )
 
 		counter += 1
 		if counter > counterlimit {
 			break
 		}
-		if o.RecentAmountRatio < 2{
-			break
-		}
 	}
+	fmt.Printf("total oo length:%d\n", len(oo))
 }
