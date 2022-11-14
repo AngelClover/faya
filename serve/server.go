@@ -24,7 +24,7 @@ func (p *StandStill) ServeHTTP(w http.ResponseWriter, r *http.Request ){
     }
     if r.URL.Path == "/ss1" {
 		s := &ServeStrategy1{}
-		b := s.Run()
+		b := s.GetCached()
 		w.Write(b)
 		//w.WriteHeader(200)
 		return

@@ -2,6 +2,7 @@ package serve
 
 import (
 	"encoding/json"
+	"faya/db"
 	"faya/features"
 	"faya/list"
 	"fmt"
@@ -248,19 +249,35 @@ func (s *ServeStrategy1) Run() []byte{
 
 	AmountRatioHeadPrint(ans.OO)
 	//fmt.Println(ans)
+	ret := []byte("")
 	b, err := json.Marshal(ans.OO)
 	if err != nil {
 		fmt.Println(err)
-		return []byte("")
+		ret = []byte("")
 	}else {
-		return []byte("{\"tm\":\"" + ans.Tm + "\",\"data\":" + string(b) + "}")
+		ret = []byte("{\"tm\":\"" + ans.Tm + "\",\"data\":" + string(b) + "}")
+
+		cacheKey := "ss1"
+		db.Insert(cacheKey, string(ret))
 	}
+	return ret
 	
 
 	//lc := list.GetStamp(contrastDate)
 
 }
 
+func (s *ServeStrategy1) GetCached() []byte {
+	cacheKey := "ss1"
+	contentStr, had := db.Get(cacheKey)
+	var content []byte 
+	if had == true {
+		content = []byte(contentStr)
+	} else {
+		content = s.Run()
+	}
+	return content
+}
 
 
 func AmountRatioHeadPrint(oo [] O){
