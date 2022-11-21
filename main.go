@@ -29,6 +29,14 @@ func main() {
 	}
 		
 	switch os.Args[1] {
+	case "job":
+		fmt.Println("job")
+		jobname := "prefill"
+		if len(os.Args) > 2{
+			jobname = os.Args[2]
+		}
+		cronlist.JobRun(jobname)
+
 	case "ss":
 		fmt.Println("ss")
 		code := "1"

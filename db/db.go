@@ -68,6 +68,36 @@ func getInstance() *redis.Client {
 /*
 api level cache
 */
+func SimpleGet(key string) (string, bool) {
+	if read == false {
+		return "", false
+	}
+	// 	time.Sleep(1 * time.Second)
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+	defer rdb.Close()
+
+	val, err := rdb.Get(ctx, key).Result()
+	//exsistance
+	if err == redis.Nil {
+		fmt.Println("key:", key, "does not exist")
+		return "", false
+	} else if err != nil {
+		fmt.Println("cannot found out", key, "should panic", err)
+// 		panic(key + "not found")
+	}
+
+	if len(val) < 3{
+		fmt.Println("cache key:", key, "content:", val, "len:", len(val))
+		return  "", false
+	}
+	return val, true
+
+}
+
 func Get(key string) (string, bool) {
 	if read == false {
 		return "", false
@@ -164,6 +194,23 @@ func Get(key string) (string, bool) {
 	return cc.Content, true
 }
 
+func SimpleInsert(key string, val string) {
+	if write == false {
+		return 
+	}
+	rdb := redis.NewClient(&redis.Options{
+        Addr:     "localhost:6379",
+        Password: "", // no password set
+        DB:       0,  // use default DB
+    })
+	defer rdb.Close()
+
+	err := rdb.Set(ctx, key, val, 0).Err()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("set ", key, "succ ")
+}
 func Insert(key string, val string) {
 	if write == false {
 		return 
