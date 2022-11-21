@@ -3,6 +3,7 @@ package main
 import (
 	// 	"faya/strategy"
 
+	"faya/cronlist"
 	"faya/filter"
 	"faya/function"
 	"faya/list"
@@ -152,6 +153,7 @@ func main() {
 		function.Backtrace(tm)
 	
 	case "server":
+		cronlist.Init()
 		mux := &serve.StandStill{}
 		http.ListenAndServe(":8080", mux)
 	
