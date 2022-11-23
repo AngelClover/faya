@@ -1,8 +1,7 @@
 package cronlist
 
 import (
-	"encoding/json"
-	"faya/db"
+	"faya/cronlist/jobstatus"
 	"faya/function"
 	"faya/serve"
 	"faya/strategy"
@@ -11,13 +10,6 @@ import (
 
 	"github.com/robfig/cron/v3"
 )
-
-type JobStatus struct {
-	Status string `json:"status"`
-	LastTime time.Time `json:"tm"`
-	ProgressUp int `json:"pgu"`
-	ProgressDown int `json:"pgd"`
-}
 
 
 type JobListUnit struct {
@@ -29,57 +21,23 @@ JobListUnit{Name: "ss1", Func: Ss1Job},
 JobListUnit{Name: "prefill", Func: PrefillJob},
 }
 
-func GetJobCacheKey(jn string) string{
-	return "job_status_" + jn
-}
-func GetJobStatus(jobname string) *JobStatus {
-	ck := GetJobCacheKey(jobname)
-	ct, succ := db.SimpleGet(ck)
-	if succ {
-		var js JobStatus
-		ct_byte := []byte(ct)
-		err := json.Unmarshal(ct_byte, &js)
-		if err != nil {
-			fmt.Println("dbdata unmarshal error", err.Error)
-			fmt.Println(ct)
-			return nil
-		}else {
-			return &js
-		}
-	} else {
-		return nil
-	}
-}
-func SetJobStatus(jobname string, js *JobStatus) {
-	ck := GetJobCacheKey(jobname)
-
-	ct, err := json.Marshal(js)
-	if err != nil {
-		fmt.Println("set job status err ", jobname, err)
-		panic(err)
-	}
-
-	db.SimpleInsert(ck, string(ct))
-
-}
-
 
 func Ss1Job(){
 	jobname := "ss1"
 	fmt.Println("ss1 job begin")
-	js := GetJobStatus(jobname)
+	js := jobstatus.GetJobStatus(jobname)
 
 	timeTenMinutesBefore := time.Now().Add(time.Minute * -10)
 	if (js != nil && js.Status == "complete" && js.LastTime.After(timeTenMinutesBefore)){
 		fmt.Println("ss1 is calced in 10 minutes, won't calc again")
 	}else {
-		jb := &JobStatus{
+		jb := &jobstatus.JobStatus{
 			Status : "started",
 			LastTime : time.Now(),
 			ProgressUp : 0,
 			ProgressDown : 1,
 		}
-		SetJobStatus(jobname, jb)
+		jobstatus.SetJobStatus(jobname, jb)
 
 		ss := &serve.ServeStrategy1{}
 		ss.Run()
@@ -87,16 +45,46 @@ func Ss1Job(){
 		jb.Status = "complete"
 		jb.LastTime = time.Now()
 		jb.ProgressUp += 1
-		SetJobStatus(jobname, jb)
+		jobstatus.SetJobStatus(jobname, jb)
 	}
 	fmt.Println("ss1 job end")
 }
 
 func PrefillJob(){
+	jobname := "prefill"
 	fmt.Println("prefill job begin")
-	function.Prefill()
-	strategy.ZtReview()
-	strategy.Day5DowngradeViewer()
+	js := jobstatus.GetJobStatus(jobname)
+
+	timeHourBefore := time.Now().Add(time.Hour * -1)
+	if (js != nil && js.Status == "complete" && js.LastTime.After(timeHourBefore)){
+		fmt.Println("prefill is calced in 10 minutes, won't calc again")
+	}else {
+		jb := &jobstatus.JobStatus{
+			Status : "started",
+			LastTime : time.Now(),
+			ProgressUp : 0,
+			ProgressDown : 3,
+		}
+		jobstatus.SetJobStatus(jobname, jb)
+
+		function.Prefill()
+		jb.Status = "prefilled"
+		jb.LastTime = time.Now()
+		jb.ProgressUp += 1
+		jobstatus.SetJobStatus(jobname, jb)
+
+		strategy.ZtReview()
+		jb.Status = "ztreviewed"
+		jb.LastTime = time.Now()
+		jb.ProgressUp += 1
+		jobstatus.SetJobStatus(jobname, jb)
+
+		strategy.Day5DowngradeViewer()
+		jb.Status = "complete"
+		jb.LastTime = time.Now()
+		jb.ProgressUp += 1
+		jobstatus.SetJobStatus(jobname, jb)
+	}
 	fmt.Println("prefill job end")
 }
 
