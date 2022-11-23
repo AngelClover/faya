@@ -27,7 +27,7 @@ func Ss1Job(){
 	fmt.Println("ss1 job begin")
 	js := jobstatus.GetJobStatus(jobname)
 
-	timeTenMinutesBefore := time.Now().Add(time.Minute * -10)
+	timeTenMinutesBefore := time.Now().Add(time.Minute * -4)
 	if (js != nil && js.Status == "complete" && js.LastTime.After(timeTenMinutesBefore)){
 		fmt.Println("ss1 is calced in 10 minutes, won't calc again")
 	}else {

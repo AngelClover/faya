@@ -6,6 +6,7 @@ import (
 	"faya/features"
 	"faya/list"
 	"fmt"
+	"math"
 	"sort"
 	"strings"
 	"time"
@@ -111,6 +112,9 @@ type O struct {
 
 	DetP float64 `json:"detp"`
 	DetpFlag bool `json:"detpf"`
+
+	TenOnSeventy int `json:"tos"`
+	TenOnSeventyFlag bool `json:"tosf"`
 }
 
 func (s *ServeStrategy1) Run() []byte{
@@ -155,7 +159,8 @@ func (s *ServeStrategy1) Run() []byte{
 		a := list.RiKCodeReverse(op.Code)
 		features.GetRecentTurnover(a)
 		//bk := features.GetBk(op)
-		if len(a) > 2{
+		ll := len(a)
+		if ll > 2{
 			var o O
 			//basic feature
 			o.Code = op.Code
@@ -176,6 +181,10 @@ func (s *ServeStrategy1) Run() []byte{
 				o.CheckedDate = a[1].Date
 			}
 			o.RecentAmountRatio = o.AmNow / o.AmLast
+			InQCondition := (o.RecentAmountRatio >= 2)
+			if !InQCondition {
+				continue
+			}
 
 			detpt, ok := op.DetP.(float64)
 			if ok{
@@ -223,10 +232,49 @@ func (s *ServeStrategy1) Run() []byte{
 			}else {
 				o.WeekAmountFlag = false
 			}
+			
 
+			//golden crossing
+			features.GetDayAvg(a, 10)
+			features.GetDayAvg(a, 73)
+			
+			tenOnSeventy := func(rk *list.RiKUnit) bool{
+				if rk.Features["Day10"] == 0 {
+					return false
+				}
+				if rk.Features["Day73"] == 0 {
+					return false
+				}
+
+				det := rk.Features["Day10"].(float64) - rk.Features["Day73"].(float64)
+				if math.Abs(det) < 0.01 {
+					return false
+				}
+				return det > 0
+			}
+			today := tenOnSeventy(a[0])
+			length := 0
+			for j := 0; j < ll; j++{
+				rk := a[j]
+				if tenOnSeventy(rk) == today{
+					length += 1
+				}else {
+					break
+				}
+			}
+			if today {
+				o.TenOnSeventy = length
+			}else {
+				o.TenOnSeventy = -length
+			}
+			if o.TenOnSeventy >= -1 && o.TenOnSeventy < 5 {
+				o.TenOnSeventyFlag = true
+			}else {
+				o.TenOnSeventyFlag = false
+			}
 
 			//put in queue condition
-			if o.RecentAmountRatio >= 2{
+			if InQCondition {
 				ans.OO = append(ans.OO, o)
 			}
 			//fmt.Println(o, am_last, am_now)
