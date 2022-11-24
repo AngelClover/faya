@@ -16,6 +16,9 @@ var (
 	write = true
 	clear = false
 	doNotCheckTime = false
+	RedisAddr = "localhost:6379"
+	RedisPass = os.Getenv("REDIS_PASS") //in .env
+	DbNo = 0 // default db
 )
 
 type cacheUnit struct {
@@ -26,9 +29,9 @@ type cacheUnit struct {
 func client() {
 
 	rdb := redis.NewClient(&redis.Options{
-        Addr:     "localhost:6379",
-        Password: "", // no password set
-        DB:       0,  // use default DB
+        Addr:     RedisAddr,
+        Password: RedisPass // no password set
+        DB:       DbNo,  // use default DB
     })
 
     err := rdb.Set(ctx, "key", "value", 0).Err()
@@ -56,9 +59,9 @@ func getInstance() *redis.Client {
 	var inc *redis.Client
 	if inc == nil {
 		rdb := redis.NewClient(&redis.Options{
-			Addr:     "localhost:6379",
-			Password: "", // no password set
-			DB:       0,  // use default DB
+			Addr:     RedisAddr,
+			Password: RedisPass // no password set
+			DB:       DbNo,  // use default DB
 		})
 		inc = rdb
 	}
@@ -74,9 +77,9 @@ func SimpleGet(key string) (string, bool) {
 	}
 	// 	time.Sleep(1 * time.Second)
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     RedisAddr,
+		Password: RedisPass // no password set
+		DB:       DbNo,  // use default DB
 	})
 	defer rdb.Close()
 
@@ -104,9 +107,9 @@ func Get(key string) (string, bool) {
 	}
 	// 	time.Sleep(1 * time.Second)
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     RedisAddr,
+		Password: RedisPass // no password set
+		DB:       DbNo,  // use default DB
 	})
 	defer rdb.Close()
 
@@ -199,9 +202,9 @@ func SimpleInsert(key string, val string) {
 		return 
 	}
 	rdb := redis.NewClient(&redis.Options{
-        Addr:     "localhost:6379",
-        Password: "", // no password set
-        DB:       0,  // use default DB
+        Addr:     RedisAddr,
+        Password: RedisPass // no password set
+        DB:       DbNo,  // use default DB
     })
 	defer rdb.Close()
 
@@ -216,9 +219,9 @@ func Insert(key string, val string) {
 		return 
 	}
 	rdb := redis.NewClient(&redis.Options{
-        Addr:     "localhost:6379",
-        Password: "", // no password set
-        DB:       0,  // use default DB
+        Addr:     RedisAddr,
+        Password: RedisPass, // no password set
+        DB:       DbNo,  // use default DB
     })
 	defer rdb.Close()
 	if clear == true {

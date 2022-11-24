@@ -15,7 +15,9 @@ import (
 	"os"
 	"strconv"
 	"time"
+
 	//sadas
+	_ "github.com/joho/godotenv/autoload"
 )
 
 //Faya

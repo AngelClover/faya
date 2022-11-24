@@ -287,7 +287,7 @@ func (s *ServeStrategy1) Run() []byte{
 			//break
 		}
 	}
-	fmt.Println("total length:", counter)
+	//fmt.Println("total length:", counter)
 
 	sort.Slice(ans.OO, func(i, j int) bool {
 		return ans.OO[i].RecentAmountRatio > ans.OO[j].RecentAmountRatio
