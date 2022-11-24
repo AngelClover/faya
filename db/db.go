@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -30,7 +31,7 @@ func client() {
 
 	rdb := redis.NewClient(&redis.Options{
         Addr:     RedisAddr,
-        Password: RedisPass // no password set
+        Password: RedisPass, // no password set
         DB:       DbNo,  // use default DB
     })
 
@@ -60,7 +61,7 @@ func getInstance() *redis.Client {
 	if inc == nil {
 		rdb := redis.NewClient(&redis.Options{
 			Addr:     RedisAddr,
-			Password: RedisPass // no password set
+			Password: RedisPass, // no password set
 			DB:       DbNo,  // use default DB
 		})
 		inc = rdb
@@ -78,7 +79,7 @@ func SimpleGet(key string) (string, bool) {
 	// 	time.Sleep(1 * time.Second)
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     RedisAddr,
-		Password: RedisPass // no password set
+		Password: RedisPass, // no password set
 		DB:       DbNo,  // use default DB
 	})
 	defer rdb.Close()
@@ -108,7 +109,7 @@ func Get(key string) (string, bool) {
 	// 	time.Sleep(1 * time.Second)
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     RedisAddr,
-		Password: RedisPass // no password set
+		Password: RedisPass, // no password set
 		DB:       DbNo,  // use default DB
 	})
 	defer rdb.Close()
@@ -203,7 +204,7 @@ func SimpleInsert(key string, val string) {
 	}
 	rdb := redis.NewClient(&redis.Options{
         Addr:     RedisAddr,
-        Password: RedisPass // no password set
+        Password: RedisPass, // no password set
         DB:       DbNo,  // use default DB
     })
 	defer rdb.Close()
