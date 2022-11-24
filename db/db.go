@@ -18,9 +18,11 @@ var (
 	clear = false
 	doNotCheckTime = false
 	RedisAddr = "localhost:6379"
-	RedisPass = os.Getenv("REDIS_PASS") //in .env
 	DbNo = 0 // default db
 )
+func RedisPass() string {
+	return os.Getenv("REDIS_PASS") //in .env
+}
 
 type cacheUnit struct {
 	Content string "json:ctt"
@@ -31,7 +33,7 @@ func client() {
 
 	rdb := redis.NewClient(&redis.Options{
         Addr:     RedisAddr,
-        Password: RedisPass, // no password set
+        Password: RedisPass(), // no password set
         DB:       DbNo,  // use default DB
     })
 
@@ -61,7 +63,7 @@ func getInstance() *redis.Client {
 	if inc == nil {
 		rdb := redis.NewClient(&redis.Options{
 			Addr:     RedisAddr,
-			Password: RedisPass, // no password set
+			Password: RedisPass(), // no password set
 			DB:       DbNo,  // use default DB
 		})
 		inc = rdb
@@ -76,10 +78,11 @@ func SimpleGet(key string) (string, bool) {
 	if read == false {
 		return "", false
 	}
+	//fmt.Println("Angel Redis Params:", RedisAddr, RedisPass(), DbNo)
 	// 	time.Sleep(1 * time.Second)
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     RedisAddr,
-		Password: RedisPass, // no password set
+		Password: RedisPass(), // no password set
 		DB:       DbNo,  // use default DB
 	})
 	defer rdb.Close()
@@ -109,7 +112,7 @@ func Get(key string) (string, bool) {
 	// 	time.Sleep(1 * time.Second)
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     RedisAddr,
-		Password: RedisPass, // no password set
+		Password: RedisPass(), // no password set
 		DB:       DbNo,  // use default DB
 	})
 	defer rdb.Close()
@@ -204,7 +207,7 @@ func SimpleInsert(key string, val string) {
 	}
 	rdb := redis.NewClient(&redis.Options{
         Addr:     RedisAddr,
-        Password: RedisPass, // no password set
+        Password: RedisPass(), // no password set
         DB:       DbNo,  // use default DB
     })
 	defer rdb.Close()
@@ -221,7 +224,7 @@ func Insert(key string, val string) {
 	}
 	rdb := redis.NewClient(&redis.Options{
         Addr:     RedisAddr,
-        Password: RedisPass, // no password set
+        Password: RedisPass(), // no password set
         DB:       DbNo,  // use default DB
     })
 	defer rdb.Close()
