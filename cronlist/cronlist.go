@@ -3,7 +3,7 @@ package cronlist
 import (
 	"faya/cronlist/jobstatus"
 	"faya/function"
-	"faya/serve"
+	"faya/serve/servestrategy"
 	"faya/strategy"
 	"fmt"
 	"time"
@@ -39,7 +39,7 @@ func Ss1Job(){
 		}
 		jobstatus.SetJobStatus(jobname, jb)
 
-		ss := &serve.ServeStrategy1{}
+		ss := &servestrategy.ServeStrategy1{}
 		ss.Run()
 
 		jb.Status = "complete"

@@ -1,8 +1,10 @@
 package serve
 
 import (
+	"faya/cronlist"
 	"faya/db"
 	"faya/list"
+	"faya/serve/servestrategy"
 	"fmt"
 	"net/http"
 	"strings"
@@ -37,11 +39,28 @@ func (p *StandStill) ServeHTTP(w http.ResponseWriter, r *http.Request ){
 		return
 	}
     if r.URL.Path == "/ss1" {
-		s := &ServeStrategy1{}
+		s := &servestrategy.ServeStrategy1{}
 		b := s.GetCached()
 		w.Write(b)
 		//w.WriteHeader(200)
 		return
+	}
+	//jobs
+	if strings.HasPrefix(r.URL.Path, "/job/") {
+		jobname := r.URL.Path[5:]
+		var jt *cronlist.JobListUnit = nil
+		for _, ju := range cronlist.JobList {
+			if ju.Name == jobname {
+				jt = &ju
+				break
+			}
+		}
+		fmt.Println("I got job :", jobname, jt)
+		if jt != nil {
+			go jt.Func()
+			w.Write([]byte("{\"success\":true, \"msg\":\"job create success\"}"))
+			return
+		}
 	}
 
 	//read from redis

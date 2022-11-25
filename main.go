@@ -8,6 +8,7 @@ import (
 	"faya/function"
 	"faya/list"
 	"faya/serve"
+	"faya/serve/servestrategy"
 	"faya/strategy"
 	"faya/view"
 	"fmt"
@@ -46,7 +47,7 @@ func main() {
 			code = os.Args[2]
 		}
 		if code == "1" {
-			ss := &serve.ServeStrategy1{}
+			ss := &servestrategy.ServeStrategy1{}
 			ss.Run()
 		} else {
 			fmt.Println("param error")
