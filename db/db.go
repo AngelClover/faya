@@ -102,7 +102,6 @@ func SimpleGet(key string) (string, bool) {
 		return  "", false
 	}
 	return val, true
-
 }
 
 func Get(key string) (string, bool) {
