@@ -5,6 +5,7 @@ import (
 	"faya/list"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 
@@ -44,27 +45,30 @@ func (p *StandStill) ServeHTTP(w http.ResponseWriter, r *http.Request ){
 	}
 
 	//read from redis
-	path := r.URL.Path[1:]
-	valid := true
-	for _, c := range path {
-		if c >= '0' && c <= '9' ||
-		c >= 'A' && c <= 'Z' ||
-		c >= 'a' && c <= 'z' ||
-		c == '_' ||
-		c == '-' {
-		}else {
-			valid = false
-			break
+	if strings.HasPrefix(r.URL.Path, "/db/") {
+		path := r.URL.Path[4:]
+		valid := true
+		for _, c := range path {
+			if c >= '0' && c <= '9' ||
+			c >= 'A' && c <= 'Z' ||
+			c >= 'a' && c <= 'z' ||
+			c == '_' ||
+			c == '-' {
+			}else {
+				valid = false
+				break
+			}
+		}
+		fmt.Println("I got for redis key:", path, valid)
+		if valid {
+			contentStr, had := db.SimpleGet(path)
+			if had {
+				w.Write([]byte(contentStr))
+				return
+			}
 		}
 	}
-	fmt.Println("I got for redis key:", path, valid)
-	if valid {
-		contentStr, had := db.SimpleGet(path)
-		if had {
-			w.Write([]byte(contentStr))
-			return
-		}
-	}
+
 	
     http.NotFound(w, r)
     return
