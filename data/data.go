@@ -3,32 +3,36 @@ package data
 import (
 	"faya/list"
 	"fmt"
+	"sync"
 )
 
 var (
-	dataMap = make(map[string]interface{}, 0)
+	//dataMap = make(map[string]interface{}, 0)
+	dataMap = sync.Map{}
 )
 func Get(code string, datatype string) interface{} {
-	d, ok := dataMap[code]
+	d, ok := dataMap.Load(code)
 	if !ok {
-		dataMap[code] = make(map[string]interface{}, 0)
-		d = dataMap[code]
+		//dataMap[code] = make(map[string]interface{}, 0)
+		dataMap.Store(code, sync.Map{})
+		d, _ = dataMap.Load(code)
 	}
-	dm := d.(map[string]interface{})
-	res, okk := dm[datatype]
+	//dm := d.(map[string]interface{})
+	dm := d.(sync.Map)
+	res, okk := dm.Load(datatype)
 	if !okk {
 		//fmt.Println("get data for ", code, datatype)
 		if datatype == "rik" {
-			dm[datatype] = list.RiKCode(code)
+			dm.Store(datatype, list.RiKCode(code))
+			res, _ = dm.Load(datatype)
 // 			fmt.Println("get data:", dm[datatype])
-			res = dm[datatype]
 		}else if datatype == "rik_reverse" {
-			dm[datatype] = list.RiKCodeReverse(code)
+			dm.Store(datatype, list.RiKCodeReverse(code))
+			res, _ = dm.Load(datatype)
 // 			fmt.Println("get data:", dm[datatype])
-			res = dm[datatype]
 		}else if datatype == "bk" {
-			dm[datatype] = list.GetBkCode(code)
-			res = dm[datatype]
+			dm.Store(datatype, list.GetBkCode(code))
+			res, _ = dm.Load(datatype)
 		}else {
 			fmt.Println("get datatype error")
 			res = nil
