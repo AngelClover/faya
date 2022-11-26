@@ -158,14 +158,14 @@ func (s *ServeStrategy1) Run() []byte{
 		//fmt.Println(op)
 		a := list.RiKCodeReverse(op.Code)
 		features.GetRecentTurnover(a)
-		//bk := features.GetBk(op)
+		bk := features.GetBk(op)
 		ll := len(a)
 		if ll > 2{
 			var o O
 			//basic feature
 			o.Code = op.Code
 			o.Name = op.Name
-			o.Bk = ""
+			o.Bk = bk
 			o.Amount = []int{a[0].Amount, a[1].Amount, a[2].Amount}
 			//daily amount
 			am_now, ok := op.Amount.(float64)
@@ -307,6 +307,12 @@ func (s *ServeStrategy1) Run() []byte{
 
 		cacheKey := "ss1"
 		db.Insert(cacheKey, string(ret))
+
+
+		if !isOpening {
+			cacheKey = "ss1-" + strings.Split(ans.Tm, " ")[0]
+			db.Insert(cacheKey, string(ret))
+		}
 	}
 	return ret
 	
