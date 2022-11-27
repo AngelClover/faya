@@ -196,7 +196,7 @@ func (s *ServeStrategy1) Run(date string) []byte{
 				}
 			}
 			if base < 0{
-				fmt.Println(o.Code + "date error " + date)	
+				fmt.Println(o.Code + " no data for " + date)	
 				continue
 			}
 			
@@ -245,8 +245,9 @@ func (s *ServeStrategy1) Run(date string) []byte{
 				}else{
 					o.WeekAmount = 0
 				}
+				//TODO  how to correct choose
 				for i:=0 ;i < 5 && i < len(a); i++{
-					if i == 0 && isOpening {
+					if i == 0 {
 					}else {
 						o.WeekAmount += a[i].Amount
 					}
