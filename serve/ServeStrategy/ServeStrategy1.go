@@ -368,8 +368,11 @@ func (s *ServeStrategy1) Run(date string) []byte{
 
 }
 
-func (s *ServeStrategy1) GetCached() []byte {
+func (s *ServeStrategy1) GetCached(date string) []byte {
 	cacheKey := "ss1"
+	if date != "" {
+		cacheKey = cacheKey + "-" + date
+	}
 	contentStr, had := db.Get(cacheKey)
 	var content []byte 
 	if had == true {

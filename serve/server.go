@@ -38,9 +38,18 @@ func (p *StandStill) ServeHTTP(w http.ResponseWriter, r *http.Request ){
 		w.Write(ret)
 		return
 	}
-    if r.URL.Path == "/ss1" {
+    //if r.URL.Path == "/ss1" {
+    if strings.HasPrefix(r.URL.Path, "/ss1") {
+		date := r.URL.Path[4:]
+		if len(date) < 2 {
+			date = ""
+		}else {
+			if date[0] == '/' {
+				date = date[1:]
+			}
+		}
 		s := &servestrategy.ServeStrategy1{}
-		b := s.GetCached()
+		b := s.GetCached(date)
 		w.Write(b)
 		//w.WriteHeader(200)
 		return
