@@ -71,6 +71,27 @@ func getInstance() *redis.Client {
 	return inc
 }
 
+func GetKeyList(prefix string) []string{
+
+	var ret []string
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     RedisAddr,
+		Password: RedisPass(), // no password set
+		DB:       DbNo,  // use default DB
+	})
+	defer rdb.Close()
+
+	iter := rdb.Scan(ctx, 0, prefix+"*", 0).Iterator()
+	for iter.Next(ctx) {
+		fmt.Println("keys", iter.Val())
+		ret = append(ret, iter.Val())
+	}
+	if err := iter.Err(); err != nil {
+		panic(err)
+	}
+	return ret
+}
+
 /*
 api level cache
 */

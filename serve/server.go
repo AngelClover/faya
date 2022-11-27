@@ -40,6 +40,14 @@ func (p *StandStill) ServeHTTP(w http.ResponseWriter, r *http.Request ){
 	}
     //if r.URL.Path == "/ss1" {
     if strings.HasPrefix(r.URL.Path, "/ss1") {
+		if r.URL.Path == "/ss1list" {
+			s := &servestrategy.ServeStrategy1{}
+			b := s.GetKeyList()
+			w.Write(b)
+			return
+		}
+
+
 		date := r.URL.Path[4:]
 		if len(date) < 2 {
 			date = ""

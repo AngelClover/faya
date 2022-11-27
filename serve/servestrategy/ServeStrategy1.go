@@ -383,6 +383,29 @@ func (s *ServeStrategy1) GetCached(date string) []byte {
 	}
 	return content
 }
+func (s *ServeStrategy1) GetKeyList() []byte {
+	a := db.GetKeyList("ss1")
+	var b []string
+	for _,x := range a{
+		if len(x)>4 {
+			s := x[4:]
+			b = append(b, s)
+		}
+	}
+	fmt.Println(b)
+
+	type retStruct struct{
+		Listarray []string `json:"datelist"`
+	}
+	var ret retStruct
+	ret.Listarray = b
+
+	fmt.Println(ret)
+
+	retc, _ := json.Marshal(ret)
+	
+	return []byte(retc)
+}
 
 
 func AmountRatioHeadPrint(oo [] O){
