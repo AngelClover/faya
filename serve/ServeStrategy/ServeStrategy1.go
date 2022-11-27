@@ -117,7 +117,8 @@ type O struct {
 	TenOnSeventyFlag bool `json:"tosf"`
 }
 
-func (s *ServeStrategy1) Run() []byte{
+func (s *ServeStrategy1) Run(date string) []byte{
+
 	tm := time.Now()
 	fmt.Println("now time:", tm)
 	isOpening := list.IsOpeningTime()
@@ -126,6 +127,13 @@ func (s *ServeStrategy1) Run() []byte{
 	}else {
 		fmt.Println("is NOT Opening time")
 	}
+	realtimeMode := true
+	if date == "" {
+		realtimeMode = true
+	}else {
+		realtimeMode = false
+	}
+
 
 	t := getLastDate()
 	contrastDate := t
@@ -168,17 +176,37 @@ func (s *ServeStrategy1) Run() []byte{
 			o.Bk = bk
 			o.Amount = []int{a[0].Amount, a[1].Amount, a[2].Amount}
 			//daily amount
-			am_now, ok := op.Amount.(float64)
-			o.AmNow = am_now
-			if !ok {
-				//fmt.Println(op.Amount, "->", am_now, "not ok")
-				o.AmNow = 0
+			base := -1
+			am_now := 0.0
+			if realtimeMode {
+				am_now_, ok := op.Amount.(float64)
+				if !ok {
+					am_now = 0
+				}else {
+					am_now = am_now_
+				}
+				base = 0
+			}else {
+				for i,x := range a{
+					if x.Date == date {
+						base = i
+						am_now = float64(x.Amount)
+						break
+					}
+				}
 			}
-			o.AmLast = float64(a[0].Amount)
-			o.CheckedDate = a[0].Date
+			if base < 0{
+				fmt.Println(o.Code + "date error " + date)	
+				continue
+			}
+			
+			o.AmNow = am_now
+
+			o.AmLast = float64(a[base].Amount)
+			o.CheckedDate = a[base].Date
 			if !isOpening {
-				o.AmLast = float64(a[1].Amount)
-				o.CheckedDate = a[1].Date
+				o.AmLast = float64(a[base + 1].Amount)
+				o.CheckedDate = a[base + 1].Date
 			}
 			o.RecentAmountRatio = o.AmNow / o.AmLast
 			InQCondition := (o.RecentAmountRatio >= 2)
@@ -186,13 +214,17 @@ func (s *ServeStrategy1) Run() []byte{
 				continue
 			}
 
-			detpt, ok := op.DetP.(float64)
-			if ok{
-				o.DetP = detpt
+			if realtimeMode {
+				detpt, ok := op.DetP.(float64)
+				if ok{
+					o.DetP = detpt
+				}else {
+					o.DetP = 0
+				}
 			}else {
-				o.DetP = 0
+				o.DetP = a[base].Det
 			}
-			o.LastLastRatio = float64(a[1].Amount) / float64(a[0].Amount)
+			o.LastLastRatio = float64(a[base + 1].Amount) / float64(a[base].Amount)
 			if o.LastLastRatio < 2{
 				o.LastLastRatioFlag = true
 			}else {
@@ -206,22 +238,35 @@ func (s *ServeStrategy1) Run() []byte{
 			}
 
 			//weekly amount
-			amt, ok := op.Amount.(float64)
-			if ok {
-				o.WeekAmount = int(amt)
-			}else{
+			if realtimeMode {
+				amt, ok := op.Amount.(float64)
+				if ok {
+					o.WeekAmount = int(amt)
+				}else{
+					o.WeekAmount = 0
+				}
+				for i:=0 ;i < 5 && i < len(a); i++{
+					if i == 0 && isOpening {
+					}else {
+						o.WeekAmount += a[i].Amount
+					}
+				}
+				o.LastWeekAmount = 0
+				for i:=0 ;i < 5 && i+5 < len(a); i++{
+					o.LastWeekAmount += a[i+5].Amount
+				}
+			}else {
 				o.WeekAmount = 0
-			}
-			for i:=0 ;i < 5 && i < len(a); i++{
-				if i == 0 && isOpening {
-				}else {
-					o.WeekAmount += a[i].Amount
+				for i:=0 ;i < 5 && base + i < len(a); i++{
+					o.WeekAmount += a[base + i].Amount
+				}
+				o.LastWeekAmount = 0
+				for i:=0 ;i < 5 && base + i + 5 < len(a); i++{
+					o.LastWeekAmount += a[base + i + 5].Amount
 				}
 			}
-			o.LastWeekAmount = 0
-			for i:=0 ;i < 5 && i+5 < len(a); i++{
-				o.LastWeekAmount += a[i+5].Amount
-			}
+
+
 			if o.LastWeekAmount == 0 {
 				o.WeekAmountRatio = 0
 			}else {
@@ -252,10 +297,11 @@ func (s *ServeStrategy1) Run() []byte{
 				}
 				return det > 0
 			}
-			today := tenOnSeventy(a[0])
+
+			today := tenOnSeventy(a[base])
 			length := 0
-			for j := 0; j < ll; j++{
-				rk := a[j]
+			for j := 0; base + j < ll; j++{
+				rk := a[base + j]
 				if tenOnSeventy(rk) == today{
 					length += 1
 				}else {
@@ -305,18 +351,19 @@ func (s *ServeStrategy1) Run() []byte{
 	}else {
 		ret = []byte("{\"tm\":\"" + ans.Tm + "\",\"data\":" + string(b) + "}")
 
-		cacheKey := "ss1"
-		db.Insert(cacheKey, string(ret))
-
-
-		if !isOpening {
-			cacheKey = "ss1-" + strings.Split(ans.Tm, " ")[0]
+		if realtimeMode {
+			cacheKey := "ss1"
+			db.Insert(cacheKey, string(ret))
+			if !isOpening {
+				cacheKey = "ss1-" + strings.Split(ans.Tm, " ")[0]
+				db.Insert(cacheKey, string(ret))
+			}
+		}else {
+			cacheKey := "ss1-" + date
 			db.Insert(cacheKey, string(ret))
 		}
 	}
 	return ret
-	
-
 	//lc := list.GetStamp(contrastDate)
 
 }
@@ -328,7 +375,7 @@ func (s *ServeStrategy1) GetCached() []byte {
 	if had == true {
 		content = []byte(contentStr)
 	} else {
-		content = s.Run()
+		content = s.Run("")
 	}
 	return content
 }

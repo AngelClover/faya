@@ -40,7 +40,7 @@ func Ss1Job(){
 		jobstatus.SetJobStatus(jobname, jb)
 
 		ss := &servestrategy.ServeStrategy1{}
-		ss.Run()
+		ss.Run("")
 
 		jb.Status = "complete"
 		jb.LastTime = time.Now()

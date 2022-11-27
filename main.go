@@ -47,8 +47,12 @@ func main() {
 			code = os.Args[2]
 		}
 		if code == "1" {
+			date := ""
+			if len(os.Args) > 3 {
+				date = os.Args[3]
+			}
 			ss := &servestrategy.ServeStrategy1{}
-			ss.Run()
+			ss.Run(date)
 		} else {
 			fmt.Println("param error")
 			return
