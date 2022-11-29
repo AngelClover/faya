@@ -105,6 +105,7 @@ func GetKeyList(prefix string) []string{
 
 /*
 api level cache
+no expired get
 */
 func SimpleGet(key string) (string, bool) {
 	if read == false {
@@ -139,6 +140,7 @@ func SimpleGet(key string) (string, bool) {
 	return val, true
 }
 
+//will expired
 func Get(key string) (string, bool) {
 	if read == false {
 		return "", false

@@ -375,7 +375,7 @@ func (s *ServeStrategy1) GetCached(date string) []byte {
 	if date != "" {
 		cacheKey = cacheKey + "-" + date
 	}
-	contentStr, had := db.Get(cacheKey)
+	contentStr, had := db.SimpleGet(cacheKey)
 	var content []byte 
 	if had == true {
 		content = []byte(contentStr)

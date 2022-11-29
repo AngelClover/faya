@@ -23,7 +23,7 @@ func enableCors(w *http.ResponseWriter) {
 }
 
 func (p *StandStill) ServeHTTP(w http.ResponseWriter, r *http.Request ){
-	fmt.Println(time.Now(), r.URL.Path)
+	fmt.Println(r.URL.Path, time.Now())
 	enableCors(&w)
     if r.URL.Path == "/" {
         sayhelloName(w, r)
