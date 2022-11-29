@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -19,6 +20,8 @@ var (
 	doNotCheckTime = false
 	RedisAddr = "localhost:6379"
 	DbNo = 0 // default db
+	once sync.Once
+	redisInstance *redis.Client
 )
 func RedisPass() string {
 	return os.Getenv("REDIS_PASS") //in .env
@@ -59,27 +62,35 @@ func client() {
 }
 
 func getInstance() *redis.Client {
-	var inc *redis.Client
-	if inc == nil {
+	once.Do(func(){
 		rdb := redis.NewClient(&redis.Options{
 			Addr:     RedisAddr,
 			Password: RedisPass(), // no password set
 			DB:       DbNo,  // use default DB
 		})
-		inc = rdb
+		redisInstance = rdb
+	})
+	return redisInstance
+}
+
+func closeInstance() {
+	if redisInstance != nil{
+		redisInstance.Close()
 	}
-	return inc
 }
 
 func GetKeyList(prefix string) []string{
 
 	var ret []string
+	/*
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     RedisAddr,
 		Password: RedisPass(), // no password set
 		DB:       DbNo,  // use default DB
 	})
 	defer rdb.Close()
+	*/
+	rdb := getInstance()
 
 	iter := rdb.Scan(ctx, 0, prefix+"*", 0).Iterator()
 	for iter.Next(ctx) {
@@ -101,12 +112,15 @@ func SimpleGet(key string) (string, bool) {
 	}
 	//fmt.Println("Angel Redis Params:", RedisAddr, RedisPass(), DbNo)
 	// 	time.Sleep(1 * time.Second)
+	/*
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     RedisAddr,
 		Password: RedisPass(), // no password set
 		DB:       DbNo,  // use default DB
 	})
 	defer rdb.Close()
+	*/
+	rdb := getInstance()
 
 	val, err := rdb.Get(ctx, key).Result()
 	//exsistance
@@ -130,12 +144,15 @@ func Get(key string) (string, bool) {
 		return "", false
 	}
 	// 	time.Sleep(1 * time.Second)
+	/*
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     RedisAddr,
 		Password: RedisPass(), // no password set
 		DB:       DbNo,  // use default DB
 	})
 	defer rdb.Close()
+	*/
+	rdb := getInstance()
 
 	val, err := rdb.Get(ctx, key).Result()
 	//exsistance
@@ -225,12 +242,15 @@ func SimpleInsert(key string, val string) {
 	if write == false {
 		return 
 	}
+	/*
 	rdb := redis.NewClient(&redis.Options{
         Addr:     RedisAddr,
         Password: RedisPass(), // no password set
         DB:       DbNo,  // use default DB
     })
 	defer rdb.Close()
+	*/
+	rdb := getInstance()
 
 	err := rdb.Set(ctx, key, val, 0).Err()
 	if err != nil {
@@ -242,12 +262,15 @@ func Insert(key string, val string) {
 	if write == false {
 		return 
 	}
+	/*
 	rdb := redis.NewClient(&redis.Options{
         Addr:     RedisAddr,
         Password: RedisPass(), // no password set
         DB:       DbNo,  // use default DB
     })
 	defer rdb.Close()
+	*/
+	rdb := getInstance()
 	if clear == true {
 		err := rdb.Set(ctx, key, "", 0).Err()
 		if err != nil {
