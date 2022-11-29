@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -389,10 +390,22 @@ func (s *ServeStrategy1) GetKeyList() []byte {
 	for _,x := range a{
 		if len(x)>4 {
 			s := x[4:]
-			b = append(b, s)
+			al := strings.Split(s, "-")
+			if len(al) > 2 {
+				year, _ := strconv.Atoi(al[0])
+				month, _ := strconv.Atoi(al[1])
+				day, _ := strconv.Atoi(al[2])
+				tm := time.Date(year, time.Month(month), day, 0,0,0,0, time.UTC)
+				fmt.Println(s, tm.Weekday())
+				if tm.Weekday() != time.Sunday && tm.Weekday() != time.Saturday {
+					b = append(b, s)
+				}
+			}
 		}
 	}
-	fmt.Println(b)
+	sort.Slice(b, func(i,j int) bool{
+		return b[i] > b[j]
+	})
 
 	type retStruct struct{
 		Listarray []string `json:"datelist"`
