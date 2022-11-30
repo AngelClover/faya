@@ -216,7 +216,11 @@ func (s *ServeStrategy1) Run(date string) []byte{
 					o.CheckedDate = ""
 				}
 			}
-			o.RecentAmountRatio = o.AmNow / o.AmLast
+			if o.AmLast == 0.0 {
+				o.RecentAmountRatio = o.AmNow 
+			}else {
+				o.RecentAmountRatio = o.AmNow / o.AmLast
+			}
 			InQCondition := (o.RecentAmountRatio >= 2)
 			if !InQCondition {
 				continue
@@ -238,7 +242,11 @@ func (s *ServeStrategy1) Run(date string) []byte{
 				o.DetP = a[base].Det
 			}
 			if base + 1 < ll {
-				o.LastLastRatio = float64(a[base + 1].Amount) / float64(a[base].Amount)
+				div := float64(a[base].Amount)
+				if div == 0.0 {
+					div = 1
+				}
+				o.LastLastRatio = float64(a[base + 1].Amount) / div
 			}else {
 				o.LastLastRatio = 0
 			}
@@ -288,7 +296,11 @@ func (s *ServeStrategy1) Run(date string) []byte{
 			if o.LastWeekAmount == 0 {
 				o.WeekAmountRatio = 0
 			}else {
-				o.WeekAmountRatio = float64(o.WeekAmount) / float64(o.LastWeekAmount)
+				div := float64(o.LastWeekAmount)
+				if div == 0.0 {
+					div = 1
+				}
+				o.WeekAmountRatio = float64(o.WeekAmount) / div
 			}
 			if (o.WeekAmountRatio > 1.8){
 				o.WeekAmountFlag = true
