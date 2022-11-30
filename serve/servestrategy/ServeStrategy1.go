@@ -376,9 +376,19 @@ func (s *ServeStrategy1) GetCached(date string) []byte {
 		cacheKey = cacheKey + "-" + date
 	}
 	contentStr, had := db.SimpleGet(cacheKey)
+	type ContentType struct {
+		Content string `json:"Content"`
+		Tm	string `json:"Tm"`
+	}
+	var tempContent ContentType
+	err := json.Unmarshal([]byte(contentStr), &tempContent)
+	if err != nil {
+		fmt.Println("unmarshal error:", err)
+	}
+	
 	var content []byte 
 	if had == true {
-		content = []byte(contentStr)
+		content = []byte(tempContent.Content)
 	} else {
 		content = s.Run("")
 	}
