@@ -166,7 +166,7 @@ func Get(key string) (string, bool) {
 // 		panic(key + "not found")
 		//return "", false
 	}
-//  	fmt.Println("cache key:", key, "content:", val)
+  	//fmt.Println("cache key:", key, "content:", val)
 
 	if len(val) < 3{
 		fmt.Println("cache key:", key, "content:", val, "len:", len(val))
@@ -201,8 +201,10 @@ func Get(key string) (string, bool) {
 		startTime := time.Date(yn, mn, dn, 9, 15, 0, 0, loc)
 		endTime := time.Date(yn, mn, dn, 15, 0, 0, 0, loc)
 
+		//fmt.Println(yn, mn, dn, " vs ", yr, mr, dr)
 		//in the trading time
 		//do not refresh
+		//TODO is this right ??
 		if startTime.Before(now) && endTime.After(now) {
 			return cc.Content, true
 		}
@@ -236,7 +238,7 @@ func Get(key string) (string, bool) {
 	}
 
 	// read correct from db
-//  	fmt.Println("get ", key, "from db")
+  	//fmt.Println("get ", key, "from db")
 	return cc.Content, true
 }
 

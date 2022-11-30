@@ -208,8 +208,13 @@ func (s *ServeStrategy1) Run(date string) []byte{
 			o.AmLast = float64(a[base].Amount)
 			o.CheckedDate = a[base].Date
 			if !isOpening {
-				o.AmLast = float64(a[base + 1].Amount)
-				o.CheckedDate = a[base + 1].Date
+				if base + 1 < ll {
+					o.AmLast = float64(a[base + 1].Amount)
+					o.CheckedDate = a[base + 1].Date
+				}else {
+					o.AmLast = 0
+					o.CheckedDate = ""
+				}
 			}
 			o.RecentAmountRatio = o.AmNow / o.AmLast
 			InQCondition := (o.RecentAmountRatio >= 2)
@@ -217,7 +222,7 @@ func (s *ServeStrategy1) Run(date string) []byte{
 				continue
 			}
 			if base > 0 {
-				o.NextDayDetP = float64(a[base - 1].Det)
+				o.NextDayDetP = a[base - 1].Det
 			}else {
 				o.NextDayDetP = -100.0
 			}
@@ -232,7 +237,11 @@ func (s *ServeStrategy1) Run(date string) []byte{
 			}else {
 				o.DetP = a[base].Det
 			}
-			o.LastLastRatio = float64(a[base + 1].Amount) / float64(a[base].Amount)
+			if base + 1 < ll {
+				o.LastLastRatio = float64(a[base + 1].Amount) / float64(a[base].Amount)
+			}else {
+				o.LastLastRatio = 0
+			}
 			if o.LastLastRatio < 2{
 				o.LastLastRatioFlag = true
 			}else {
