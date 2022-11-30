@@ -116,6 +116,8 @@ type O struct {
 
 	TenOnSeventy int `json:"tos"`
 	TenOnSeventyFlag bool `json:"tosf"`
+
+	NextDayDetP float64 `json:"next"`
 }
 
 func (s *ServeStrategy1) Run(date string) []byte{
@@ -213,6 +215,11 @@ func (s *ServeStrategy1) Run(date string) []byte{
 			InQCondition := (o.RecentAmountRatio >= 2)
 			if !InQCondition {
 				continue
+			}
+			if base > 0 {
+				o.NextDayDetP = float64(a[base - 1].Det)
+			}else {
+				o.NextDayDetP = -100.0
 			}
 
 			if realtimeMode {
