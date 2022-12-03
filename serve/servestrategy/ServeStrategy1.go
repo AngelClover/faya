@@ -374,12 +374,13 @@ func (s *ServeStrategy1) Run(date string) []byte{
 	AmountRatioHeadPrint(ans.OO)
 	//fmt.Println(ans)
 	ret := []byte("")
-	b, err := json.Marshal(ans.OO)
+	b, err := json.Marshal(ans)
 	if err != nil {
 		fmt.Println(err)
 		ret = []byte("")
 	}else {
-		ret = []byte("{\"tm\":\"" + ans.Tm + "\",\"data\":" + string(b) + "}")
+		//ret = []byte("{\"tm\":\"" + ans.Tm + "\",\"data\":" + string(b) + "}")
+		ret = []byte(b)
 
 		if realtimeMode {
 			cacheKey := "ss1"
@@ -393,6 +394,13 @@ func (s *ServeStrategy1) Run(date string) []byte{
 			db.Insert(cacheKey, string(ret))
 		}
 	}
+	/*
+	by, err := json.Marshal(ans)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(by))
+	*/
 	return ret
 	//lc := list.GetStamp(contrastDate)
 

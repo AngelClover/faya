@@ -18,6 +18,7 @@ type JobListUnit struct {
 }
 var JobList []JobListUnit = []JobListUnit{
 JobListUnit{Name: "ss1", Func: Ss1Job},
+JobListUnit{Name: "ss1backtrace", Func: Ss1JobBacktrace},
 JobListUnit{Name: "prefill", Func: PrefillJob},
 }
 
@@ -48,6 +49,39 @@ func Ss1Job(){
 		jobstatus.SetJobStatus(jobname, jb)
 	}
 	fmt.Println("ss1 job end")
+}
+func Ss1JobBacktrace() {
+	jobname := "ss1backtrace"
+	fmt.Println("ss1 job backtrace begin")
+	//js := jobstatus.GetJobStatus(jobname)
+
+	timeTheDayBefore := time.Now().Add(time.Hour * -24)
+	for ;timeTheDayBefore.Weekday() == time.Saturday ||
+	timeTheDayBefore.Weekday() == time.Sunday;
+	timeTheDayBefore = timeTheDayBefore.Add(time.Hour * -24) {
+	}
+
+	y, m, d := timeTheDayBefore.Date()
+	tm := fmt.Sprintf("%d-%02d-%02d", y, m, d)
+	fmt.Println("ss1 backtrace will run for ", tm)
+
+	jb := &jobstatus.JobStatus{
+		Status : "ss1 backtrace started",
+		LastTime : time.Now(),
+		ProgressUp : 0,
+		ProgressDown : 1,
+	}
+	jobstatus.SetJobStatus(jobname, jb)
+
+	ss := &servestrategy.ServeStrategy1{}
+	ss.Run(tm)
+
+	jb.Status = "complete"
+	jb.LastTime = time.Now()
+	jb.ProgressUp += 1
+	jobstatus.SetJobStatus(jobname, jb)
+	fmt.Println("ss1 job backtrace end")
+
 }
 
 func PrefillJob(){
@@ -104,6 +138,10 @@ func Init() {
 	c.AddFunc("TZ=Asia/Shanghai 0 16-23 * * 1-5", Ss1Job)
 	//each hour run for test
 
+	//backtrace
+	c.AddFunc("TZ=Asia/Shanghai 0 16-23 * * 1-5", Ss1JobBacktrace)
+
+	//prefill
 	c.AddFunc("TZ=Asia/Shanghai 0 16-23 * * 1-5", PrefillJob)
 	c.AddFunc("TZ=Asia/Shanghai 0 0-8 * * 1-5", PrefillJob)
 
